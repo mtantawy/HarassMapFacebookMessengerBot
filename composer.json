@@ -1,0 +1,13 @@
+{
+    "name": "mtantawy/harass-map-fb-messenger-bot",
+    "type": "project",
+    "require": {
+        "tgallice/fb-messenger-sdk": "^0.1.0"
+    },
+    "authors": [
+        {
+            "name": "Mahmoud Tantawy",
+            "email": "me@mtantawy.com"
+        }
+    ]
+}
