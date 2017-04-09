@@ -1,8 +1,14 @@
 {
     "name": "mtantawy/harass-map-fb-messenger-bot",
     "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:mtantawy/fb-messenger-sdk.git"
+        }
+    ],
     "require": {
-        "tgallice/fb-messenger-sdk": "^0.1.0"
+        "tgallice/fb-messenger-sdk": "dev-master"
     },
     "authors": [
         {
