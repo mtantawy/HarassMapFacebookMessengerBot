@@ -8,7 +8,9 @@
         }
     ],
     "require": {
-        "tgallice/fb-messenger-sdk": "dev-master"
+        "tgallice/fb-messenger-sdk": "dev-master",
+        "vlucas/phpdotenv": "^2.4",
+        "symfony/console": "^3.2"
     },
     "authors": [
         {
