@@ -1,6 +1,12 @@
 {
     "name": "mtantawy/harass-map-fb-messenger-bot",
     "type": "project",
+    "authors": [
+        {
+            "name": "Mahmoud Tantawy",
+            "email": "me@mtantawy.com"
+        }
+    ],
     "repositories": [
         {
             "type": "vcs",
@@ -12,10 +18,9 @@
         "vlucas/phpdotenv": "^2.4",
         "symfony/console": "^3.2"
     },
-    "authors": [
-        {
-            "name": "Mahmoud Tantawy",
-            "email": "me@mtantawy.com"
+    "autoload": {
+        "psr-4": {
+            "HarassMapFbMessengerBot\\": "src/"
         }
-    ]
+    }
 }
