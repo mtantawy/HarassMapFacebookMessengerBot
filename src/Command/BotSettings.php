@@ -5,15 +5,15 @@ use Tgallice\FBMessenger\Model\Button\Postback;
 return [
     'get_started' => 'get_started',
     'greeting_text' => [
-        'default' => 'لاهل بك فى خارطة التحرش!',
+        'default' => 'لاهل بك {{user_first_name}} فى خارطة التحرش!',
         'localized' => [
             [
                 'locale' => 'en_US',
-                'text' => 'Welcome to HarassMap!'
+                'text' => 'Welcome {{user_first_name}} to HarassMap!'
             ],
             [
                 'locale' => 'ar_AR',
-                'text' => 'لاهل بك فى خارطة التحرش!'
+                'text' => 'لاهل بك {{user_first_name}} فى خارطة التحرش!'
             ],
         ]
     ],
