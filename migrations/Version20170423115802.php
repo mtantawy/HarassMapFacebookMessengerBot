@@ -15,9 +15,10 @@ class Version20170423115802 extends AbstractMigration
                 `psid` VARCHAR(255) NOT NULL,
                 `first_name` VARCHAR(255) NOT NULL,
                 `last_name` VARCHAR(255) NOT NULL,
-                `locale` VARCHAR(10) NOT NULL,
-                `timezone` TINYINT NOT NULL,
-                `gender` TINYINT UNSIGNED NOT NULL,
+                `locale` VARCHAR(10) DEFAULT NULL,
+                `timezone` TINYINT DEFAULT NULL,
+                `gender` VARCHAR(255) DEFAULT NULL,
+                `preferred_language` VARCHAR(10) DEFAULT NULL,
                 `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 `updated_at` DATETIME on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE (`psid`)
