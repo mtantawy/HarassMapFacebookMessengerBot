@@ -23,7 +23,6 @@ $webookHandler = new WebhookRequestHandler($pageToken, $verifyToken);
 if ($webookHandler->isValidVerifyTokenRequest()) {
     header("HTTP/1.1 200 OK");
     echo $webookHandler->getChallenge();
-    die();
 }
 
 $dbConnectionParams = require('migrations-db.php');
