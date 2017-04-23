@@ -16,7 +16,9 @@
     "require": {
         "tgallice/fb-messenger-sdk": "dev-master",
         "vlucas/phpdotenv": "^2.4",
-        "symfony/console": "^3.2"
+        "symfony/console": "^3.2",
+        "doctrine/dbal": "^2.5",
+        "doctrine/migrations": "^1.5"
     },
     "autoload": {
         "psr-4": {
