@@ -3,7 +3,7 @@
 use Tgallice\FBMessenger\Model\Button\Postback;
 
 return [
-    'get_started' => 'get_started',
+    'get_started' => 'GET_STARTED',
     'greeting_text' => [
         'default' => 'لاهل بك {{user_first_name}} فى خارطة التحرش!',
         'localized' => [

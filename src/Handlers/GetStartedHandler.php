@@ -2,8 +2,11 @@
 namespace HarassMapFbMessengerBot\Handlers;
 
 use Tgallice\FBMessenger\Messenger;
+use Tgallice\FBMessenger\Model\Message;
+use Tgallice\FBMessenger\Model\QuickReply\Text;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 
 class GetStartedHandler implements Handler
 {
@@ -29,16 +32,38 @@ class GetStartedHandler implements Handler
     {
         $userProfile = $this->messenger->getUserProfile($this->event->getSenderId());
 
-        $this->dbConnection->insert('users', [
-            'psid' => $this->event->getSenderId(),
-            'first_name' => $userProfile->getFirstName(),
-            'last_name' => $userProfile->getLastName(),
-            'locale' => $userProfile->getLocale(),
-            'timezone' => $userProfile->getTimezone(),
-            'gender' => $userProfile->getGender(),
-            'preferred_language' => $userProfile->getLocale() ?? self::LOCALE_DEFAULT,
+        try {
+            $this->dbConnection->insert('users', [
+                'psid' => $this->event->getSenderId(),
+                'first_name' => $userProfile->getFirstName(),
+                'last_name' => $userProfile->getLastName(),
+                'locale' => $userProfile->getLocale(),
+                'timezone' => $userProfile->getTimezone(),
+                'gender' => $userProfile->getGender(),
+                'preferred_language' => $userProfile->getLocale() ?? self::LOCALE_DEFAULT,
+            ]);
+        } catch (UniqueConstraintViolationException $e) {
+            $this->dbConnection->update(
+                'users',
+                [
+                    'first_name' => $userProfile->getFirstName(),
+                    'last_name' => $userProfile->getLastName(),
+                    'locale' => $userProfile->getLocale(),
+                    'timezone' => $userProfile->getTimezone(),
+                    'gender' => $userProfile->getGender(),
+                ],
+                [
+                    'psid' => $this->event->getSenderId()
+                ]
+            );
+        }
+
+        $message = new Message('أساعدك ازاى؟');
+        $message->setQuickReplies([
+            new Text('الإبلاغ عن حالة تحرش', 'REPORT_INCIDENT'),
+            new Text('عرض بلاغات التحرش', 'GET_INCIDENTS')
         ]);
 
-        $response = $this->messenger->sendMessage($this->event->getSenderId(), 'Got your profile ;)');
+        $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
     }
 }
