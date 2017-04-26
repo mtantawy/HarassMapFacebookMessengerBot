@@ -8,6 +8,8 @@ use Tgallice\FBMessenger\WebhookRequestHandler;
 use Tgallice\FBMessenger\Callback\MessageEvent;
 use Tgallice\FBMessenger\Callback\PostbackEvent;
 use HarassMapFbMessengerBot\Handlers\GetStartedHandler;
+use HarassMapFbMessengerBot\Handlers\ReportIncidentHandler;
+use HarassMapFbMessengerBot\Handlers\GetIncidentsHandler;
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
 $dotenv->load();
@@ -32,11 +34,15 @@ $events = $webookHandler->getAllCallbackEvents();
 
 foreach ($events as $event) {
     if ($event instanceof MessageEvent) {
-        $response = $messenger->sendMessage($event->getSenderId(), 'Got: '.$event->getMessageText());
-    } elseif ($event instanceof PostbackEvent) {
-        if ($event->getPostbackPayload() === 'get_started') {
-            $getStartedHandler = new GetStartedHandler($messenger, $event, $dbConnection);
-            $getStartedHandler->handle();
+        if ($event->isQuickReply() && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')) {
+            $eventHandler = new GetIncidentsHandler($messenger, $event, $dbConnection);
+        } else {
+            $eventHandler = new ReportIncidentHandler($messenger, $event, $dbConnection);
         }
+    } elseif ($event instanceof PostbackEvent && $event->getPostbackPayload() === 'GET_STARTED') {
+        $eventHandler = new GetStartedHandler($messenger, $event, $dbConnection);
+    }
+    if (isset($eventHandler)) {
+        $eventHandler->handle();
     }
 }

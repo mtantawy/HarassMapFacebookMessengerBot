@@ -96,9 +96,7 @@ class ReportIncidentHandler implements Handler
             new WebUrl('نظرة للدراسات النسوية', 'http://nazra.org/%D8%A7%D8%AA%D8%B5%D9%84-%D8%A8%D9%86%D8%A7'),
             new WebUrl('خريطة التحرش', 'http://harassmap.org/ar/contact-us/'),
         ];
-
         $message = new Button('تواصل معنا للمساعدة:', $elements);
-
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
         $this->advanceReportStep($report);
