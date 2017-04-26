@@ -345,10 +345,31 @@ class ReportIncidentHandler implements Handler
 
     private function getUserByPSID(string $psid): array
     {
-        return $this->dbConnection->fetchAssoc(
+        $user = $this->dbConnection->fetchAssoc(
             'SELECT * FROM `users` WHERE `psid` = ?',
             [$psid]
         );
+
+        if (! is_array($user)) {
+            $userProfile = $this->messenger->getUserProfile($this->event->getSenderId());
+
+            $this->dbConnection->insert('users', [
+                'psid' => $this->event->getSenderId(),
+                'first_name' => $userProfile->getFirstName(),
+                'last_name' => $userProfile->getLastName(),
+                'locale' => $userProfile->getLocale(),
+                'timezone' => $userProfile->getTimezone(),
+                'gender' => $userProfile->getGender(),
+                'preferred_language' => $userProfile->getLocale() ?? self::LOCALE_DEFAULT,
+            ]);
+
+            $user = $this->dbConnection->fetchAssoc(
+                'SELECT * FROM `users` WHERE `psid` = ?',
+                [$psid]
+            );
+        }
+
+        return $user;
     }
 
     private function getInProgressReportByUser(int $id): array

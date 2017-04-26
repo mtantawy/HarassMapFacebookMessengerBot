@@ -48,6 +48,7 @@ class GetIncidentsHandler implements Handler
         } else {
             $message = new Message('لا يوجد المزيد من التقارير');
             $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
+            return;
         }
 
         $message = new Message($report);
