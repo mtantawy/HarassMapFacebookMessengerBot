@@ -23,8 +23,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 new Postback('تغيير اللغة إلى English', 'CHANGE_LANGUAGE'),
-                new Postback('الإبلاغ عن حالة تحرش', 'REPORT_INCIDENT'),
-                new Postback('الاستعلام عن بلاغات التحرش', 'GET_INCIDENTS'),
+                new Postback('المساعدة', 'GET_STARTED'),
             ]
         ],
         [
@@ -32,8 +31,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 new Postback('Change language to العربية', 'CHANGE_LANGUAGE'),
-                new Postback('Report Harassment Incident', 'REPORT_INCIDENT'),
-                new Postback('Get Harassment Incidents', 'GET_INCIDENTS'),
+                new Postback('Help', 'GET_STARTED'),
             ]
         ],
         [
@@ -41,8 +39,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 new Postback('تغيير اللغة إلى English', 'CHANGE_LANGUAGE'),
-                new Postback('الإبلاغ عن حالة تحرش', 'REPORT_INCIDENT'),
-                new Postback('الاستعلام عن بلاغات التحرش', 'GET_INCIDENTS'),
+                new Postback('المساعدة', 'GET_STARTED'),
             ]
         ],
     ]
