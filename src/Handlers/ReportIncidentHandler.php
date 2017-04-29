@@ -12,6 +12,7 @@ use Tgallice\FBMessenger\Model\Attachment\Template\Button;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use DateTime;
+use Exception;
 
 class ReportIncidentHandler implements Handler
 {
@@ -375,10 +376,16 @@ class ReportIncidentHandler implements Handler
     private function getInProgressReportByUser(int $id): array
     {
         $doneStatus = $this->steps[count($this->steps) - 1];
-        return $this->dbConnection->fetchAssoc(
+        $report = $this->dbConnection->fetchAssoc(
             'SELECT * FROM `reports` WHERE `user_id` = ? AND `step` != "' . $doneStatus . '" order by updated_at DESC limit 1',
             [$id]
         );
+
+        if (!is_array($report)) {
+            throw new Exception('Can not find report for given user!');
+        }
+
+        return $report;
     }
 
     private function advanceReportStep(array $report)
