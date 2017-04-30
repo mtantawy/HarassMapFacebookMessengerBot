@@ -10,6 +10,7 @@ use Tgallice\FBMessenger\Callback\PostbackEvent;
 use HarassMapFbMessengerBot\Handlers\GetStartedHandler;
 use HarassMapFbMessengerBot\Handlers\ReportIncidentHandler;
 use HarassMapFbMessengerBot\Handlers\GetIncidentsHandler;
+use Tgallice\FBMessenger\Exception\ApiException;
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
 $dotenv->load();
@@ -32,17 +33,21 @@ $dbConnection = DriverManager::getConnection($dbConnectionParams);
 
 $events = $webookHandler->getAllCallbackEvents();
 
-foreach ($events as $event) {
-    if ($event instanceof MessageEvent) {
-        if ($event->isQuickReply() && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')) {
-            $eventHandler = new GetIncidentsHandler($messenger, $event, $dbConnection);
-        } else {
-            $eventHandler = new ReportIncidentHandler($messenger, $event, $dbConnection);
+try {
+    foreach ($events as $event) {
+        if ($event instanceof MessageEvent) {
+            if ($event->isQuickReply() && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')) {
+                $eventHandler = new GetIncidentsHandler($messenger, $event, $dbConnection);
+            } else {
+                $eventHandler = new ReportIncidentHandler($messenger, $event, $dbConnection);
+            }
+        } elseif ($event instanceof PostbackEvent && $event->getPostbackPayload() === 'GET_STARTED') {
+            $eventHandler = new GetStartedHandler($messenger, $event, $dbConnection);
         }
-    } elseif ($event instanceof PostbackEvent && $event->getPostbackPayload() === 'GET_STARTED') {
-        $eventHandler = new GetStartedHandler($messenger, $event, $dbConnection);
+        if (isset($eventHandler)) {
+            $eventHandler->handle();
+        }
     }
-    if (isset($eventHandler)) {
-        $eventHandler->handle();
-    }
+} catch (ApiException | Exception $e) {
+    header("HTTP/1.1 200 OK");
 }
