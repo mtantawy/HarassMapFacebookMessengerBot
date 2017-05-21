@@ -8,6 +8,12 @@ use Slim\Http\Response;
 use Doctrine\DBAL\DriverManager;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\WebhookRequestHandler;
+use Tgallice\FBMessenger\Callback\MessageEvent;
+use Tgallice\FBMessenger\Callback\PostbackEvent;
+use HarassMapFbMessengerBot\Handlers\GetStartedHandler;
+use HarassMapFbMessengerBot\Handlers\ReportIncidentHandler;
+use HarassMapFbMessengerBot\Handlers\GetIncidentsHandler;
+use Tgallice\FBMessenger\Exception\ApiException;
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
 $dotenv->load();
@@ -44,22 +50,20 @@ $app->post('/', function (Request $request, Response $response) {
         foreach ($events as $event) {
             if ($event instanceof MessageEvent) {
                 if ($event->isQuickReply() && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')) {
-                    $eventHandler = new GetIncidentsHandler($messenger, $event, $dbConnection);
+                    $eventHandler = new GetIncidentsHandler($this->messenger, $event, $this->dbConnection);
                 } else {
-                    $eventHandler = new ReportIncidentHandler($messenger, $event, $dbConnection);
+                    $eventHandler = new ReportIncidentHandler($this->messenger, $event, $this->dbConnection);
                 }
             } elseif ($event instanceof PostbackEvent && $event->getPostbackPayload() === 'GET_STARTED') {
-                $eventHandler = new GetStartedHandler($messenger, $event, $dbConnection);
+                $eventHandler = new GetStartedHandler($this->messenger, $event, $this->dbConnection);
             }
             if (isset($eventHandler)) {
                 $eventHandler->handle();
             }
         }
     } catch (ApiException | Exception $e) {
-        //
+        return $response->withStatus(200);
     }
-
-    return $response->withStatus(200);
 });
 
 $app->run();
