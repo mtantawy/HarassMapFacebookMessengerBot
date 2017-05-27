@@ -1,5 +1,5 @@
 <?php
-namespace HarassMapFbMessengerBot\Handlers;
+namespace HarassMapFbMessengerBot\Handler;
 
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Callback\CallbackEvent;

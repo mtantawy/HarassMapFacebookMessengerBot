@@ -1,5 +1,5 @@
 <?php
-namespace HarassMapFbMessengerBot\Handlers;
+namespace HarassMapFbMessengerBot\Handler;
 
 use Doctrine\DBAL\Connection;
 use Tgallice\FBMessenger\Messenger;
