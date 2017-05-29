@@ -266,7 +266,7 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('الساعة كام نقريبا؟');
+        $message = new Message('الساعة كام تقريبا؟');
         $message->setQuickReplies([
             new Text('12 الظهر', 'REPORT_INCIDENT_TIME_12'),
             new Text('3 العصر', 'REPORT_INCIDENT_TIME_15'),
@@ -331,7 +331,7 @@ class ReportIncidentHandler implements Handler
             'step' => reset($this->steps),
         ]);
 
-        $response = $this->messenger->sendMessage($this->event->getSenderId(), 'تقدري تبلغي عن حادثة التحرش هنا بسرية تامه.  مش هنحتفظ باي بيانات او معلومات شخصية ليكي.');
+        $response = $this->messenger->sendMessage($this->event->getSenderId(), 'تقدري تبلغي عن حادثة التحرش هنا بسرية تامه.  مش هنحتفظ بأي بيانات او معلومات شخصية ليكي.');
 
         $message = new Message('علاقتك بالبلاغ؟');
         $message->setQuickReplies([
