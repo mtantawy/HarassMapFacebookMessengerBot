@@ -20,6 +20,7 @@ use HarassMapFbMessengerBot\Handler\GetIncidentsHandler;
 use HarassMapFbMessengerBot\Middleware\UserMiddleware;
 use HarassMapFbMessengerBot\Service\UserService;
 use HarassMapFbMessengerBot\Service\ReportService;
+use HarassMapFbMessengerBot\Controller\ReportController;
 use Tgallice\FBMessenger\Exception\ApiException;
 
 $dotenv = new Dotenv\Dotenv(__DIR__);
@@ -63,6 +64,8 @@ $app->get('/', function (Request $request, Response $response) {
     }
 });
 
+$app->post('/report/datetime', ReportController::class);
+
 $app->post('/', function (Request $request, Response $response) {
     $this->logger->debug(json_encode($request->getParsedBody()));
 
@@ -77,19 +80,19 @@ $app->post('/', function (Request $request, Response $response) {
 
             switch ($this->conversationRouter->route($event, $user)) {
                 case $this->conversationRouter::HANDLER_GET_STARTED:
-                       $eventHandler = new GetStartedHandler($this->messenger, $event, $this->dbConnection);
+                       $eventHandler = new GetStartedHandler($this, $event);
                     break;
 
                 case $this->conversationRouter::HANDLER_REPORT_INCIDENT:
-                       $eventHandler = new ReportIncidentHandler($this->messenger, $event, $this->dbConnection);
+                       $eventHandler = new ReportIncidentHandler($this, $event);
                     break;
 
                 case $this->conversationRouter::HANDLER_GET_INCIDENTS:
-                       $eventHandler = new GetIncidentsHandler($this->messenger, $event, $this->dbConnection);
+                       $eventHandler = new GetIncidentsHandler($this, $event);
                     break;
 
                 default:
-                       $eventHandler = new GetStartedHandler($this->messenger, $event, $this->dbConnection);
+                       $eventHandler = new GetStartedHandler($this, $event);
                     break;
             }
 

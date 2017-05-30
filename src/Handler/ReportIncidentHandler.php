@@ -1,6 +1,9 @@
 <?php
 namespace HarassMapFbMessengerBot\Handler;
 
+use HarassMapFbMessengerBot\Report;
+use HarassMapFbMessengerBot\Service\ReportService;
+use HarassMapFbMessengerBot\Service\UserService;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Callback\MessageEvent;
@@ -8,9 +11,11 @@ use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\QuickReply\Text;
 use Tgallice\FBMessenger\Model\QuickReply\Location;
 use Tgallice\FBMessenger\Model\Button\WebUrl;
+use Tgallice\FBMessenger\Model\Button\Postback;
 use Tgallice\FBMessenger\Model\Attachment\Template\Button;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Interop\Container\ContainerInterface;
 use DateTime;
 use Exception;
 
@@ -22,63 +27,63 @@ class ReportIncidentHandler implements Handler
 
     private $dbConnection;
 
-    private $steps = [
-        'init',
-        'relation',
-        'details',
-        'date',
-        'time',
-        'harassment_type',
-        'harassment_type_details',
-        'assistance_offered',
-        'location',
-        'done'
-    ];
+    private $userService;
+
+    private $reportService;
+
+    protected $container;
 
     public function __construct(
-        Messenger $messenger,
-        CallbackEvent $event,
-        Connection $dbConnection
+        ContainerInterface $container,
+        CallbackEvent $event
     ) {
-        $this->messenger = $messenger;
+        $this->container = $container;
         $this->event = $event;
-        $this->dbConnection = $dbConnection;
+        $this->messenger = $this->container->messenger;
+        $this->dbConnection = $this->container->dbConnection;
+        $this->userService = $this->container->userService;
+        $this->reportService = $this->container->reportService;
     }
 
     public function handle()
     {
-        if ($this->event->getQuickReplyPayload() === 'REPORT_INCIDENT') {
+        if ($this->event instanceof MessageEvent
+            && $this->event->getQuickReplyPayload() === 'REPORT_INCIDENT') {
             $this->startReport();
-        } elseif (0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_RELATIONSHIP')) {
+        } elseif ($this->event instanceof MessageEvent
+            && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_RELATIONSHIP')) {
             $this->saveRelationship();
-        } elseif (! $this->event->isQuickReply() && $this->event->getMessage()->hasText()) {
+        } elseif ($this->event instanceof MessageEvent
+            && ! $this->event->isQuickReply() && $this->event->getMessage()->hasText()) {
             $this->saveDetails();
-        } elseif (0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_DATE')) {
-            $this->saveDate();
-        } elseif (0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_TIME')) {
-            $this->saveTime();
-        } elseif (0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_TYPE')) {
+        } elseif (0 === mb_strpos($this->event->getPostbackPayload(), 'REPORT_INCIDENT_DATETIME')) {
+            $this->saveDateTime();
+        } elseif ($this->event instanceof MessageEvent
+            && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_TYPE')) {
             $this->saveHarassmentType();
-        } elseif (0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_DETAILS')) {
+        } elseif ($this->event instanceof MessageEvent
+            && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_DETAILS')) {
             $this->saveHarassmentDetails();
-        } elseif (0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_ASSISTANCE_OFFERED')) {
+        } elseif ($this->event instanceof MessageEvent
+            && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_ASSISTANCE_OFFERED')) {
             $this->saveAssistanceOffered();
-        } elseif (! $this->event->isQuickReply() && $this->event->getMessage()->hasLocation()) {
+        } elseif ($this->event instanceof MessageEvent
+            && ! $this->event->isQuickReply() && $this->event->getMessage()->hasLocation()) {
             $this->saveLocation();
         }
     }
 
     private function saveLocation()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'latitude',
             $this->event->getMessage()->getLatitude(),
             $report
         );
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'longitude',
             $this->event->getMessage()->getLongitude(),
             $report
@@ -100,20 +105,20 @@ class ReportIncidentHandler implements Handler
         $message = new Button('تواصل معنا للمساعدة:', $elements);
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function saveAssistanceOffered()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
         $assistenceOffered = mb_substr(
             $this->event->getQuickReplyPayload(),
             mb_strlen('REPORT_INCIDENT_ASSISTANCE_OFFERED_')
         );
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'assistence_offered',
             $assistenceOffered === 'YES' ? 1 : 0,
             $report
@@ -126,20 +131,20 @@ class ReportIncidentHandler implements Handler
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function saveHarassmentDetails()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
         $harassmentDetails = mb_substr(
             $this->event->getQuickReplyPayload(),
             mb_strlen('REPORT_INCIDENT_HARASSMENT_DETAILS_')
         );
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'harassment_type_details',
             $harassmentDetails,
             $report
@@ -153,20 +158,20 @@ class ReportIncidentHandler implements Handler
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function saveHarassmentType()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
         $harassmentType = mb_substr(
             $this->event->getQuickReplyPayload(),
             mb_strlen('REPORT_INCIDENT_HARASSMENT_TYPE_')
         );
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'harassment_type',
             $harassmentType,
             $report
@@ -200,18 +205,18 @@ class ReportIncidentHandler implements Handler
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function saveTime()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
         $timeHour = mb_substr($this->event->getQuickReplyPayload(), mb_strlen('REPORT_INCIDENT_TIME_'));
         $time = new DateTime($timeHour . ':00');
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'time',
             $time->format('H:i:s'),
             $report
@@ -225,91 +230,63 @@ class ReportIncidentHandler implements Handler
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
-    private function saveDate()
+    private function saveDateTime()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
-        $dateMessage = mb_substr($this->event->getQuickReplyPayload(), mb_strlen('REPORT_INCIDENT_DATE_'));
-        switch ($dateMessage) {
-            case 'TODAY':
-                $date = new DateTime();
-                $date = $date->format('Y-m-d');
-                break;
-
-            case 'YESTERDAY':
-                $date = new DateTime();
-                $date->setTimestamp(strtotime('yesterday'));
-                $date = $date->format('Y-m-d');
-                break;
-
-            case '2_DAYS_AGO':
-                $date = new DateTime();
-                $date->setTimestamp(strtotime('2 days ago'));
-                $date = $date->format('Y-m-d');
-                break;
-
-            case 'DATE_EARLIER':
-            default:
-                $date = new DateTime();
-                $date->setTimestamp(strtotime('1 week ago'));
-                $date = $date->format('Y-m-d');
-                break;
+        if ($this->event->getPostbackPayload() === 'REPORT_INCIDENT_DATETIME_NOW') {
+            $datetime = new DateTime();
+            $datetime = $datetime->format('Y-m-d H:i:s');
         }
 
-        $this->saveAnswerToReport(
-            'date',
-            $date,
+        $this->reportService->saveAnswerToReport(
+            'datetime',
+            $datetime,
             $report
         );
 
-        $message = new Message('الساعة كام تقريبا؟');
+        $message = new Message('نوع التحرش؟');
         $message->setQuickReplies([
-            new Text('12 الظهر', 'REPORT_INCIDENT_TIME_12'),
-            new Text('3 العصر', 'REPORT_INCIDENT_TIME_15'),
-            new Text('6 مساء', 'REPORT_INCIDENT_TIME_18'),
-            new Text('12 نصف الليل', 'REPORT_INCIDENT_TIME_00'),
-            new Text('6 الفجر', 'REPORT_INCIDENT_TIME_6'),
+            new Text('لفظى', 'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'),
+            new Text('جسدى', 'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'),
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function saveDetails()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'details',
             $this->event->getMessageText(),
             $report
         );
 
-        $message = new Message('امتى حصل التحرش؟');
-        $message->setQuickReplies([
-            new Text('النهارده', 'REPORT_INCIDENT_DATE_TODAY'),
-            new Text('امبارح', 'REPORT_INCIDENT_DATE_YESTERDAY'),
-            new Text('اول امبارح', 'REPORT_INCIDENT_DATE_DAY_BEFORE_YESTERDAY'),
-            new Text('قبل كده', 'REPORT_INCIDENT_DATE_EARLIER'),
-        ]);
-
+        $elements = [
+            new Postback('دلوقتى', 'REPORT_INCIDENT_DATETIME_NOW'),
+            new WebUrl('إدخل الوقت و التاريخ', 'https://v2.hmfbbot.mtantawy.com/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()])),
+        ];
+        $message = new Button('امتى حصل التحرش؟', $elements);
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function saveRelationship()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
-        $report = $this->getInProgressReportByUser($user['id']);
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
+        $report = $this->reportService->getInProgressReportByUser($user->getId());
 
-        $this->saveAnswerToReport(
+        $this->reportService->saveAnswerToReport(
             'relation',
             mb_substr($this->event->getQuickReplyPayload(), mb_strlen('REPORT_INCIDENT_RELATIONSHIP_')),
             $report
@@ -319,17 +296,14 @@ class ReportIncidentHandler implements Handler
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($report);
+        $this->reportService->advanceReportStep($report);
     }
 
     private function startReport()
     {
-        $user = $this->getUserByPSID($this->event->getSenderId());
+        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
 
-        $this->dbConnection->insert('reports', [
-            'user_id' => $user['id'],
-            'step' => reset($this->steps),
-        ]);
+        $this->reportService->startReportForUser($user->getId());
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), 'تقدري تبلغي عن حادثة التحرش هنا بسرية تامه.  مش هنحتفظ بأي بيانات او معلومات شخصية ليكي.');
 
@@ -341,76 +315,6 @@ class ReportIncidentHandler implements Handler
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->advanceReportStep($this->getInProgressReportByUser($user['id']));
-    }
-
-    private function getUserByPSID(string $psid): array
-    {
-        $user = $this->dbConnection->fetchAssoc(
-            'SELECT * FROM `users` WHERE `psid` = ?',
-            [$psid]
-        );
-
-        if (! is_array($user)) {
-            $userProfile = $this->messenger->getUserProfile($this->event->getSenderId());
-
-            $this->dbConnection->insert('users', [
-                'psid' => $this->event->getSenderId(),
-                'first_name' => $userProfile->getFirstName(),
-                'last_name' => $userProfile->getLastName(),
-                'locale' => $userProfile->getLocale(),
-                'timezone' => $userProfile->getTimezone(),
-                'gender' => $userProfile->getGender(),
-                'preferred_language' => $userProfile->getLocale() ?? self::LOCALE_DEFAULT,
-            ]);
-
-            $user = $this->dbConnection->fetchAssoc(
-                'SELECT * FROM `users` WHERE `psid` = ?',
-                [$psid]
-            );
-        }
-
-        return $user;
-    }
-
-    private function getInProgressReportByUser(int $id): array
-    {
-        $doneStatus = $this->steps[count($this->steps) - 1];
-        $report = $this->dbConnection->fetchAssoc(
-            'SELECT * FROM `reports` WHERE `user_id` = ? AND `step` != "' . $doneStatus . '" order by updated_at DESC limit 1',
-            [$id]
-        );
-
-        if (!is_array($report)) {
-            throw new Exception('Can not find report for given user!');
-        }
-
-        return $report;
-    }
-
-    private function advanceReportStep(array $report)
-    {
-        $this->dbConnection->update(
-            'reports',
-            [
-                'step' => $this->steps[array_search($report['step'], $this->steps) + 1]
-            ],
-            [
-                'id' => $report['id']
-            ]
-        );
-    }
-
-    private function saveAnswerToReport(string $field, string $answer, array $report)
-    {
-        $this->dbConnection->update(
-            'reports',
-            [
-                $field => $answer
-            ],
-            [
-                'id' => $report['id']
-            ]
-        );
+        $this->reportService->advanceReportStep($this->reportService->getInProgressReportByUser($user->getId()));
     }
 }

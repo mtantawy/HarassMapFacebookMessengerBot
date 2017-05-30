@@ -1,13 +1,12 @@
 <?php
 namespace HarassMapFbMessengerBot\Handler;
 
-use Doctrine\DBAL\Connection;
-use Tgallice\FBMessenger\Messenger;
+use Interop\Container\ContainerInterface;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 
 interface Handler
 {
-    public function __construct(Messenger $messenger, CallbackEvent $event, Connection $dbConnection);
+    public function __construct(ContainerInterface $container, CallbackEvent $event);
 
     public function handle();
 }

@@ -5,6 +5,7 @@ use HarassMapFbMessengerBot\User;
 use Interop\Container\ContainerInterface;
 use Tgallice\FBMessenger\Model\UserProfile;
 use DateTime;
+use Exception;
 
 class UserService
 {
@@ -17,24 +18,18 @@ class UserService
         $this->container = $container;
     }
 
-    public function getOrCreateUserByFacebookPSID(string $psid): User
-    {
-        if (is_null($user = $this->getUserByFacebookPSID($psid))) {
-            $this->createUser($psid, $this->getFacebookUserProfile($psid));
-            $user = $this->getUserByFacebookPSID($psid);
-        }
-
-        return $user;
-    }
-
-    public function getUserByFacebookPSID(string $psid): ?User
+    public function getById(int $id): User
     {
         $user = $this->container->dbConnection->fetchAssoc(
-            'SELECT * FROM `' . self::TABLE_USERS . '` WHERE `psid` = ?',
-            [$psid]
+            'SELECT * FROM `' . self::TABLE_USERS . '` WHERE `id` = ?',
+            [$id]
         );
 
-        return is_array($user) ? new User(
+        if (!is_array($user)) {
+            throw new Exception('Can not find user!');
+        }
+
+        return new User(
             $user['psid'],
             $user['first_name'],
             $user['last_name'],
@@ -45,7 +40,44 @@ class UserService
             $user['id'],
             new DateTime($user['created_at']),
             new DateTime($user['updated_at'])
-        ) : null;
+        );
+    }
+
+    public function getOrCreateUserByFacebookPSID(string $psid): User
+    {
+        try {
+            $user = $this->getUserByFacebookPSID($psid);
+        } catch (Exception $e) {
+            $this->createUser($psid, $this->getFacebookUserProfile($psid));
+            $user = $this->getUserByFacebookPSID($psid);
+        }
+
+        return $user;
+    }
+
+    public function getUserByFacebookPSID(string $psid): User
+    {
+        $user = $this->container->dbConnection->fetchAssoc(
+            'SELECT * FROM `' . self::TABLE_USERS . '` WHERE `psid` = ?',
+            [$psid]
+        );
+
+        if (!is_array($user)) {
+            throw new Exception('Can not find user!');
+        }
+
+        return new User(
+            $user['psid'],
+            $user['first_name'],
+            $user['last_name'],
+            $user['locale'],
+            $user['timezone'],
+            $user['gender'],
+            $user['preferred_language'],
+            $user['id'],
+            new DateTime($user['created_at']),
+            new DateTime($user['updated_at'])
+        );
     }
 
     public function createUser(string $psid, UserProfile $facebookUserProfile)

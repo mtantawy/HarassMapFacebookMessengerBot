@@ -7,6 +7,7 @@ use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\QuickReply\Text;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Interop\Container\ContainerInterface;
 use DateTime;
 
 class GetIncidentsHandler implements Handler
@@ -17,14 +18,16 @@ class GetIncidentsHandler implements Handler
 
     private $dbConnection;
 
+    protected $container;
+
     public function __construct(
-        Messenger $messenger,
-        CallbackEvent $event,
-        Connection $dbConnection
+        ContainerInterface $container,
+        CallbackEvent $event
     ) {
-        $this->messenger = $messenger;
+        $this->container = $container;
         $this->event = $event;
-        $this->dbConnection = $dbConnection;
+        $this->messenger = $this->container->messenger;
+        $this->dbConnection = $this->container->dbConnection;
     }
 
     public function handle()

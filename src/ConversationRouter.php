@@ -23,6 +23,7 @@ class ConversationRouter
 
     public function route(CallbackEvent $event, User $user): string
     {
+        $this->container->logger->debug(get_class($event));
         if ($this->isGetStarted($event, $user)) {
             $this->container->logger->debug(self::HANDLER_GET_STARTED);
             return self::HANDLER_GET_STARTED;
@@ -33,6 +34,8 @@ class ConversationRouter
             $this->container->logger->debug(self::HANDLER_GET_INCIDENTS);
             return self::HANDLER_GET_INCIDENTS;
         }
+
+        return '';
     }
 
     private function isGetStarted(CallbackEvent $event, User $user): bool
@@ -47,8 +50,9 @@ class ConversationRouter
 
     private function isReportIncident(CallbackEvent $event): bool
     {
-        return ($event instanceof MessageEvent
-            && 0 !== mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')
+        return (($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'REPORT_INCIDENT'))
+            || ($event instanceof MessageEvent
+            && 0 !== mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS'))
         );
     }
 

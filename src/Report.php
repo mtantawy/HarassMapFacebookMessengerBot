@@ -9,21 +9,31 @@ class Report
     const STEP_INIT = 'init';
     const STEP_RELATION = 'relation';
     const STEP_DETAILS = 'details';
-    const STEP_DATE = 'date';
-    const STEP_TIME = 'time';
+    const STEP_DATETIME = 'datetime';
     const STEP_HARASSMENT_TYPE = 'harassment_type';
     const STEP_HARASSMENT_TYPE_DETAILS = 'harassment_type_details';
     const STEP_ASSISTANCE_OFFERED = 'assistance_offered';
     const STEP_LOCATION = 'location';
     const STEP_DONE = 'done';
 
+    const ORDERED_STEPS = [
+        self::STEP_INIT,
+        self::STEP_RELATION,
+        self::STEP_DETAILS,
+        self::STEP_DATETIME,
+        self::STEP_HARASSMENT_TYPE,
+        self::STEP_HARASSMENT_TYPE_DETAILS,
+        self::STEP_ASSISTANCE_OFFERED,
+        self::STEP_LOCATION,
+        self::STEP_DONE
+    ];
+
     private $id;
     private $userId;
     private $step;
     private $relation;
     private $details;
-    private $date;
-    private $time;
+    private $datetime;
     private $harassmentType;
     private $harassmentTypeDetails;
     private $assistenceOffered;
@@ -32,31 +42,17 @@ class Report
     private $createdAt;
     private $updatedAt;
 
-    public $orderedSteps = [
-        self::step_INIT,
-        self::step_RELATION,
-        self::step_DETAILS,
-        self::step_DATE,
-        self::step_TIME,
-        self::step_HARASSMENT_TYPE,
-        self::step_HARASSMENT_TYPE_DETAILS,
-        self::step_ASSISTANCE_OFFERED,
-        self::step_LOCATION,
-        self::step_DONE
-    ];
-
     public function __construct(
         int $userId,
         string $step,
-        string $relation,
-        string $details,
-        string $date,
-        string $time,
-        string $harassmentType,
-        string $harassmentTypeDetails,
-        bool $assistenceOffered,
-        string $latitude,
-        string $longitude,
+        string $relation = null,
+        string $details = null,
+        DateTime $datetime = null,
+        string $harassmentType = null,
+        string $harassmentTypeDetails = null,
+        bool $assistenceOffered = null,
+        string $latitude = null,
+        string $longitude = null,
         int $id = null,
         DateTime $createdAt = null,
         DateTime $updatedAt = null
@@ -66,8 +62,7 @@ class Report
         $this->step = $step;
         $this->relation = $relation;
         $this->details = $details;
-        $this->date = $date;
-        $this->time = $time;
+        $this->datetime = $datetime;
         $this->harassmentType = $harassmentType;
         $this->harassmentTypeDetails = $harassmentTypeDetails;
         $this->assistenceOffered = $assistenceOffered;
@@ -92,37 +87,37 @@ class Report
         return $this->step;
     }
 
-    public function getRelation(): string
+    public function getRelation(): ?string
     {
         return $this->relation;
     }
 
-    public function getDetails(): string
+    public function getDetails(): ?string
     {
         return $this->details;
     }
 
-    public function getDateTime(): DateTime
+    public function getDateTime(): ?DateTime
     {
-        return new DateTime($this->date . $this->time);
+        return new DateTime($this->datetime);
     }
 
-    public function getHarassmentType(): string
+    public function getHarassmentType(): ?string
     {
         return $this->harassmentType;
     }
 
-    public function getHarassmentTypeDetails(): string
+    public function getHarassmentTypeDetails(): ?string
     {
         return $this->harassmentTypeDetails;
     }
 
-    public function isAssistanceOffered(): bool
+    public function isAssistanceOffered(): ?bool
     {
         return (bool) $this->assistenceOffered;
     }
 
-    public function getLocation(): array
+    public function getLocation(): ?array
     {
         return [
             'longitude' => $this->longitude,

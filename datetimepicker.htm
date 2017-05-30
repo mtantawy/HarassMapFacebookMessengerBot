@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Incident Date/Time</title>
+</head>
+<body>
+    <link rel="stylesheet" href="https://unpkg.com/flatpickr/dist/flatpickr.min.css">
+    <script src="https://unpkg.com/flatpickr"></script>
+
+    <div class="main">
+        <h1 style="text-align: center;">إدخل تاريخ و وقت وقوع الحادثة</h1>
+        <form id="datetimeform" method="POST" action="/report/datetime" onsubmit="event.preventDefault();">
+            <input type="text" id="datetime" name="datetime" placeholder="إضغط هنا ...">
+            <input type="hidden" name="ids" id="ids">
+            <button id="send_datetime" onclick="confirmAndSendDatetime(fp);">
+                إرسل التاريخ المختار
+            </button>
+        </form>
+    </div>
+
+    <style media="screen" type="text/css">
+        .main {
+           position: fixed;   
+           top: 50%;
+           left: 50%;
+           transform: translate(-50%, -50%);
+        }
+
+        #datetimeform {
+           position: absolute;
+           top: 50%;
+           left: 50%;
+           transform: translate(-50%, -50%);
+        }
+        @media ( max-width :320px) {
+            .main {
+                 min-width: 200px;
+                 min-height: 120px;
+            }
+        }
+
+        @media ( min-width :321px) {
+            .main {
+                 min-width: 300px;
+                 min-height: 220px;
+            }
+        }
+
+        @media ( min-width :640px) {
+            .main {
+                 min-width: 480px;
+                 min-height: 320px;
+            }
+        }
+
+        @media ( min-width :1200px) {
+            .main {
+                 min-width: 700px;
+                 min-height: 400px;
+            }
+        }
+    </style>
+
+    <script type="text/javascript">
+        configs = {
+            enableTime: true,
+            altInput: true,
+            maxDate: new Date()
+        };
+        var fp = flatpickr("#datetime", configs);
+        var params = new URLSearchParams(location.search.slice(1));
+
+        confirmAndSendDatetime = function (fp) {
+            if(fp.selectedDates.length > 0 && confirm('هل انت متأكد(ة) من التاريخ ' + Flatpickr.prototype.formatDate(fp.selectedDates[0], "Y-m-d h:i K") + '؟')) {
+                sendDatetime(fp);
+            } else if (fp.selectedDates.length == 0) {
+                alert('برجاء ادخال تاريخ و وقت الحادثة');
+            }
+        }
+        sendDatetime = function (fp) {
+            // console.log(fp.selectedDates);
+            // console.log(Flatpickr.prototype.formatDate(fp.selectedDates[0], "Y-m-d h:i K"));
+            // console.log(params.get("ids"));
+            document.getElementById("ids").value = params.get("ids");
+
+            // alert(Flatpickr.prototype.formatDate(fp.selectedDates[0], "Y-m-d h:i K"));
+            // alert(params.get("ids"));
+
+            var datetimeform = document.getElementById("datetimeform");
+            datetimeform.submit();
+
+            // window.location.href = "https://www.messenger.com/closeWindow/?image_url=IMAGE_URL&display_text=DISPLAY_TEXT";
+        }
+    </script>
+</body>
+</html>
