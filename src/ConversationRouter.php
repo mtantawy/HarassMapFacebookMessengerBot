@@ -58,7 +58,8 @@ class ConversationRouter
 
     private function isGetIncidents(CallbackEvent $event): bool
     {
-        return ($event instanceof MessageEvent
+        return (($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'GET_INCIDENTS'))
+            || $event instanceof MessageEvent
             && $event->isQuickReply()
             && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')
         );
