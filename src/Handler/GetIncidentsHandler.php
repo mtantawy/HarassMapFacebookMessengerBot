@@ -5,6 +5,8 @@ use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\QuickReply\Text;
+use Tgallice\FBMessenger\Callback\MessageEvent;
+use Tgallice\FBMessenger\Callback\PostbackEvent;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Interop\Container\ContainerInterface;
@@ -20,6 +22,8 @@ class GetIncidentsHandler implements Handler
 
     protected $container;
 
+    private $payload;
+
     public function __construct(
         ContainerInterface $container,
         CallbackEvent $event
@@ -32,7 +36,11 @@ class GetIncidentsHandler implements Handler
 
     public function handle()
     {
-        if (0 === mb_strpos($this->event->getQuickReplyPayload(), 'GET_INCIDENTS')) {
+        if (($this->event instanceof MessageEvent
+            && 0 === mb_strpos($this->payload = $this->event->getQuickReplyPayload(), 'GET_INCIDENTS'))
+            || ($this->event instanceof PostbackEvent
+            && 0 === mb_strpos($this->payload = $this->event->getPostbackPayload(), 'GET_INCIDENTS'))
+        ) {
             $this->getOneReportByOffset();
         }
     }
@@ -40,8 +48,8 @@ class GetIncidentsHandler implements Handler
     private function getOneReportByOffset()
     {
         $offset = 0;
-        if (mb_strlen($this->event->getQuickReplyPayload()) > mb_strlen('GET_INCIDENTS_OFFSET_')) {
-            $offset = (int) mb_substr($this->event->getQuickReplyPayload(), mb_strlen('GET_INCIDENTS_OFFSET_'));
+        if (mb_strlen($this->payload) > mb_strlen('GET_INCIDENTS_OFFSET_')) {
+            $offset = (int) mb_substr($this->payload, mb_strlen('GET_INCIDENTS_OFFSET_'));
         }
 
         $report = $this->getReportByOffset($offset);

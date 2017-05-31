@@ -7,6 +7,7 @@ use HarassMapFbMessengerBot\Service\UserService;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Callback\MessageEvent;
+use Tgallice\FBMessenger\Callback\PostbackEvent;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\QuickReply\Text;
 use Tgallice\FBMessenger\Model\QuickReply\Location;
@@ -47,8 +48,10 @@ class ReportIncidentHandler implements Handler
 
     public function handle()
     {
-        if ($this->event instanceof MessageEvent
-            && $this->event->getQuickReplyPayload() === 'REPORT_INCIDENT') {
+        if (($this->event instanceof MessageEvent
+            && $this->event->getQuickReplyPayload() === 'REPORT_INCIDENT')
+            || ($this->event instanceof PostbackEvent
+            && $this->event->getPostbackPayload() === 'REPORT_INCIDENT')) {
             $this->startReport();
         } elseif ($this->event instanceof MessageEvent
             && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_RELATIONSHIP')) {
