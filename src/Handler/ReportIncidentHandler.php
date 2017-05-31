@@ -59,7 +59,8 @@ class ReportIncidentHandler implements Handler
         } elseif ($this->event instanceof MessageEvent
             && ! $this->event->isQuickReply() && $this->event->getMessage()->hasText()) {
             $this->saveDetails();
-        } elseif (0 === mb_strpos($this->event->getPostbackPayload(), 'REPORT_INCIDENT_DATETIME')) {
+        } elseif ($this->event instanceof PostbackEvent
+            && 0 === mb_strpos($this->event->getPostbackPayload(), 'REPORT_INCIDENT_DATETIME')) {
             $this->saveDateTime();
         } elseif ($this->event instanceof MessageEvent
             && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_TYPE')) {
