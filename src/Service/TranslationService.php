@@ -16,10 +16,10 @@ class TranslationService
         $this->container = $container;
     }
 
-    public function getLocalizedString(string $string, string $locale, string $gender = null): array
+    public function getLocalizedString(string $string, string $locale, string $gender = null): string
     {
         if (!isset($this->loadedStrings[$locale])) {
-            $this->loadedStrings[$locale] = include self::LANG_FILES_PATH . $locale . '.php';
+            $this->loadedStrings[$locale] = include __DIR__ . '/' . self::LANG_FILES_PATH . $locale . '.php';
         }
 
         if (is_array($this->loadedStrings[$locale][$string])) {

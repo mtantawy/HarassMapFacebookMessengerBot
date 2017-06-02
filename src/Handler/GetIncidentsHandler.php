@@ -1,6 +1,7 @@
 <?php
 namespace HarassMapFbMessengerBot\Handler;
 
+use HarassMapFbMessengerBot\User;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Message;
@@ -26,7 +27,8 @@ class GetIncidentsHandler implements Handler
 
     public function __construct(
         ContainerInterface $container,
-        CallbackEvent $event
+        CallbackEvent $event,
+        User $user
     ) {
         $this->container = $container;
         $this->event = $event;

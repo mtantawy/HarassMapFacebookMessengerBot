@@ -17,9 +17,11 @@ use HarassMapFbMessengerBot\ConversationRouter;
 use HarassMapFbMessengerBot\Handler\GetStartedHandler;
 use HarassMapFbMessengerBot\Handler\ReportIncidentHandler;
 use HarassMapFbMessengerBot\Handler\GetIncidentsHandler;
+use HarassMapFbMessengerBot\Handler\ChangeLanguageHandler;
 use HarassMapFbMessengerBot\Middleware\UserMiddleware;
 use HarassMapFbMessengerBot\Service\UserService;
 use HarassMapFbMessengerBot\Service\ReportService;
+use HarassMapFbMessengerBot\Service\TranslationService;
 use HarassMapFbMessengerBot\Controller\ReportController;
 use Tgallice\FBMessenger\Exception\ApiException;
 
@@ -52,6 +54,9 @@ $app = new App([
         'reportService' => function (ContainerInterface $container) {
             return new ReportService($container);
         },
+        'translationService' => function (ContainerInterface $container) {
+            return new TranslationService($container);
+        },
         'conversationRouter' => function (ContainerInterface $container) {
             return new ConversationRouter($container);
         }
@@ -70,7 +75,6 @@ $app->post('/', function (Request $request, Response $response) {
     $this->logger->debug(json_encode($request->getParsedBody()));
 
     $this->webhookHandler->handleRequest($request);
-
     $events = $this->webhookHandler->getAllCallbackEvents();
 
     try {
@@ -80,19 +84,23 @@ $app->post('/', function (Request $request, Response $response) {
 
             switch ($this->conversationRouter->route($event, $user)) {
                 case $this->conversationRouter::HANDLER_GET_STARTED:
-                       $eventHandler = new GetStartedHandler($this, $event);
+                       $eventHandler = new GetStartedHandler($this, $event, $user);
                     break;
 
                 case $this->conversationRouter::HANDLER_REPORT_INCIDENT:
-                       $eventHandler = new ReportIncidentHandler($this, $event);
+                       $eventHandler = new ReportIncidentHandler($this, $event, $user);
                     break;
 
                 case $this->conversationRouter::HANDLER_GET_INCIDENTS:
-                       $eventHandler = new GetIncidentsHandler($this, $event);
+                       $eventHandler = new GetIncidentsHandler($this, $event, $user);
+                    break;
+
+                case $this->conversationRouter::HANDLER_CHANGE_LANGUAGE:
+                       $eventHandler = new ChangeLanguageHandler($this, $event, $user);
                     break;
 
                 default:
-                       $eventHandler = new GetStartedHandler($this, $event);
+                       $eventHandler = new GetStartedHandler($this, $event, $user);
                     break;
             }
 
