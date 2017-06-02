@@ -64,6 +64,13 @@ $app->get('/', function (Request $request, Response $response) {
     }
 });
 
+$app->get('/proxy', function (Request $request, Response $response) {
+    $queryParams = $request->getQueryParams();
+    $apiResponse = file_get_contents('https://maps.harassmap.org/api?task=incidents&locationlatitude=' . $queryParams['lat'] . '&locationlongitude=' . $queryParams['lng']);
+    $response = $response->withStatus(200);
+    return $response->write($apiResponse);
+});
+
 $app->post('/report/datetime', ReportController::class);
 
 $app->post('/', function (Request $request, Response $response) {
