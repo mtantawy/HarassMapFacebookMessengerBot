@@ -275,9 +275,12 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
+        $webUrl = new WebUrl('إدخل الوقت و التاريخ', 'https://v2.hmfbbot.mtantawy.com/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()]));
+        $webUrl->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_COMPACT);
+
         $elements = [
             new Postback('دلوقتى', 'REPORT_INCIDENT_DATETIME_NOW'),
-            new WebUrl('إدخل الوقت و التاريخ', 'https://v2.hmfbbot.mtantawy.com/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()])),
+            $webUrl,
         ];
         $message = new Button('امتى حصل التحرش؟', $elements);
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);

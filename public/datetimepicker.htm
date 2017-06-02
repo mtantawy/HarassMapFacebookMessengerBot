@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Incident Date/Time</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="weui.min.css">
+</head>
+<body>
+    <h1 class="page__title" style="text-align: center;">
+        ادخل تاريخ و وقت وقوع الحادث
+    </h1>
+    <div class="weui-cells weui-cells_form">
+        <div class="weui-cell">
+            <div class="weui-cell__bd">
+                <form id="incidentDateTimeForm" method="POST" action="/report/datetime" onsubmit="event.preventDefault();">
+                    <input id="incidentDatePicker" name="datetime" type="datetime-local" class="weui-input" placeholder="ادخل التاريخ" />
+                    <input type="hidden" name="ids" id="ids">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary" onclick="confirmAndSendDatetime();">
+            <h3>ارسل</h3>
+        </a>
+    </div>
+    <div id="spinner" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">تم</p>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="weui.min.js"></script>
+    <script type="text/javascript">
+        const currentDate = getFormattedDate(new Date());
+        const dateTimePicker = document.getElementById('incidentDatePicker');
+        dateTimePicker.value = currentDate;
+        
+        var queryParams = new URLSearchParams(location.search.slice(1));
+
+         function confirmAndSendDatetime() {
+            const dateTime = dateTimePicker.value;
+
+            if(dateTime.length > 0) {
+                showSpinner();
+                sendDatetime(dateTime);
+            } else {
+                alert('برجاء ادخال تاريخ و وقت الحادث');
+            }
+        }
+
+        function sendDatetime(dateTime) {
+            document.getElementById("ids").value = queryParams.get("ids");
+
+            var incidentDateTimeForm = document.getElementById("incidentDateTimeForm");
+            incidentDateTimeForm.submit();
+        }
+
+        function showSpinner() {
+            const spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+
+            setTimeout(() => {
+                spinner.style.display = 'none';
+            }, 2000);
+        }
+
+        function getFormattedDate(date) {
+            const dateStr = date.toISOString();
+            return dateStr.replace(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}).+/, '$1');
+        }
+    </script>
+</body>
+</html>
