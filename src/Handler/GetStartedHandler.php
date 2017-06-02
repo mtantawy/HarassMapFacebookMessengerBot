@@ -37,8 +37,8 @@ class GetStartedHandler implements Handler
     {
         $message = new Message('أساعدك ازاى؟');
         $message->setQuickReplies([
-            new Text('الإبلاغ عن حالة تحرش', 'REPORT_INCIDENT'),
             new Text('عرض بلاغات التحرش', 'GET_INCIDENTS'),
+            new Text('الإبلاغ عن حالة تحرش', 'REPORT_INCIDENT'),
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
