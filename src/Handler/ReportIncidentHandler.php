@@ -261,23 +261,23 @@ class ReportIncidentHandler implements Handler
         switch ($harassmentType) {
             case 'VERBAL':
                 $harassmentTypeDetails = [
-                    new Text('النظر المتفحّص', 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL1'),
-                    new Text('التلميحات بالوجه', 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL2'),
-                    new Text('الندءات (البسبسة)', 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL3'),
-                    new Text('التعليقات', 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL4'),
-                    new Text('الملاحقة أو التتبع', 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL5'),
-                    new Text('الدعوة الجنسة', 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL6'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][1], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL1'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][2], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL2'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][3], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL3'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][4], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL4'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][5], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL5'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][6], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL6'),
                 ];
                 break;
 
             case 'PHYSICAL':
                 $harassmentTypeDetails = [
-                    new Text('اللمس', 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL1'),
-                    new Text('التعري', 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL2'),
-                    new Text('التهديد والترهيب', 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL3'),
-                    new Text('الاعتداء الجنسي', 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL4'),
-                    new Text('الاغتصاب', 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL5'),
-                    new Text('التحرش الجماعي', 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL6'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][1], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL1'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][2], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL2'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][3], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL3'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][4], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL4'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][5], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL5'),
+                    new Text(Report::HARASSMENT_TYPES['verbal'][6], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL6'),
                 ];
                 break;
         }

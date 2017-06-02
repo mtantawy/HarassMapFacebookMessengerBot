@@ -19,6 +19,8 @@ class GetIncidentsHandler implements Handler
 
     private $event;
 
+    private $user;
+
     private $dbConnection;
 
     protected $container;
@@ -32,6 +34,7 @@ class GetIncidentsHandler implements Handler
     ) {
         $this->container = $container;
         $this->event = $event;
+        $this->user = $user;
         $this->messenger = $this->container->messenger;
         $this->dbConnection = $this->container->dbConnection;
     }
