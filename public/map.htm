@@ -34,11 +34,11 @@
       function getData() {
           const httpRequest = new XMLHttpRequest();
           httpRequest.onreadystatechange = function(){
-              if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
-                  const jsonData = JSON.parse(httpRequest.responseText);
-                  console.log(jsonData);
-              } else {
-                  console.log('Error!');
+              if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                  if (httpRequest.status === 200) {
+                      const jsonData = JSON.parse(httpRequest.responseText);
+                      console.log(jsonData.payload);
+                  }
               }
           };
 
@@ -48,6 +48,6 @@
 
       getData();
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyA0Dx1zQH44b4LbYz6vQQolm0smv1zGPns&callback=initMap" async defer></script>
   </body>
 </html>
