@@ -52,4 +52,9 @@ return [
         'female' => 'شاهده عليه',
         'male' => 'شاهد عليه'
     ],
+    'more_details' => 'تفاصيل اكتر',
+    'report_datetime' => 'تاريخ التقرير',
+    'relationship_reporting' => 'علاقة مرسل التقرير بالحادثة',
+    'incident_datetime' => 'تاريخ الواقعة',
+    'details' => 'التفاصيل'
 ];

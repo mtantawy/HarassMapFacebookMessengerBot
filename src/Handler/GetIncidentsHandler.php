@@ -2,6 +2,7 @@
 namespace HarassMapFbMessengerBot\Handler;
 
 use HarassMapFbMessengerBot\User;
+use HarassMapFbMessengerBot\Report;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Callback\CallbackEvent;
 use Tgallice\FBMessenger\Model\Message;
@@ -103,127 +104,175 @@ class GetIncidentsHandler implements Handler
         foreach ($report as $key => $value) {
             switch ($key) {
                 case 'created_at':
-                    $preparedReport .= PHP_EOL . 'تاريخ التقرير: ' . $value;
+                    $preparedReport .= PHP_EOL . $this->container->translationService->getLocalizedString(
+                        'report_datetime',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ': ' . $value;
                     break;
 
                 case 'relation':
                     switch ($value) {
                         case 'PERSONAL':
-                            $relation = 'نفسه';
+                            $relation = $this->container->translationService->getLocalizedString(
+                                'relationship_personal',
+                                $this->user->getPreferredLanguage(),
+                                $this->user->getGender()
+                            );
                             break;
 
                         case 'WITNESS':
-                            $relation = 'شاهد';
+                            $relation = $this->container->translationService->getLocalizedString(
+                                'relationship_witness',
+                                $this->user->getPreferredLanguage(),
+                                $this->user->getGender()
+                            );
                             break;
                         
                         default:
                             $relation = '';
                             break;
                     }
-                    $preparedReport .= PHP_EOL . 'علاقة مرسل التقرير بالحادثة: ' . $relation;
+                    $preparedReport .= PHP_EOL . $this->container->translationService->getLocalizedString(
+                        'relationship_reporting',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ': ' . $relation;
                     break;
 
                 case 'details':
-                    $preparedReport .= PHP_EOL . 'التفاصيل: ' . $value;
+                    $preparedReport .= PHP_EOL . $this->container->translationService->getLocalizedString(
+                        'details',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ': ' . $value;
                     break;
 
-                case 'date':
-                    $preparedReport .= PHP_EOL . 'تاريخ الحادثة: ' . $value;
-                    break;
-
-                case 'time':
-                    $preparedReport .= PHP_EOL . 'وقت الحادثة: ' . $value;
+                case 'datetime':
+                    $preparedReport .= PHP_EOL . $this->container->translationService->getLocalizedString(
+                        'incident_datetime',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ': ' . $value;
                     break;
 
                 case 'harassment_type':
                     switch ($value) {
                         case 'VERBAL':
-                            $harassmentType = 'لفظى';
+                            $harassmentType = $this->container->translationService->getLocalizedString(
+                                'verbal',
+                                $this->user->getPreferredLanguage(),
+                                $this->user->getGender()
+                            );
                             break;
 
                         case 'PHYSICAL':
-                            $harassmentType = 'جسدى';
+                            $harassmentType = $this->container->translationService->getLocalizedString(
+                                'physical',
+                                $this->user->getPreferredLanguage(),
+                                $this->user->getGender()
+                            );
                             break;
                         
                         default:
                             $harassmentType = '';
                             break;
                     }
-                    $preparedReport .= PHP_EOL . 'نوع التحرش: ' . $harassmentType;
+                    $preparedReport .= PHP_EOL . $harassmentType = $this->container->translationService->getLocalizedString(
+                        'harassment_type',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ': ' . $harassmentType;
                     break;
 
                 case 'harassment_type_details':
                     switch ($value) {
                         case 'VERBAL1':
-                            $harassmentTypeDetails = 'النظر المتفحّص';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][1];
                             break;
 
                         case 'VERBAL2':
-                            $harassmentTypeDetails = 'التلميحات بالوجه';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][2];
                             break;
 
                         case 'VERBAL3':
-                            $harassmentTypeDetails = 'الندءات (البسبسة)';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][3];
                             break;
 
                         case 'VERBAL4':
-                            $harassmentTypeDetails = 'التعليقات';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][4];
                             break;
 
                         case 'VERBAL5':
-                            $harassmentTypeDetails = 'الملاحقة أو التتبع';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][5];
                             break;
 
                         case 'VERBAL6':
-                            $harassmentTypeDetails = 'الدعوة الجنسة';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][6];
                             break;
 
                         case 'PHYSICAL1':
-                            $harassmentTypeDetails = 'اللمس';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][1];
                             break;
 
                         case 'PHYSICAL2':
-                            $harassmentTypeDetails = 'التعري';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][2];
                             break;
 
                         case 'PHYSICAL3':
-                            $harassmentTypeDetails = 'التهديد والترهيب';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][3];
                             break;
 
                         case 'PHYSICAL4':
-                            $harassmentTypeDetails = 'الاعتداء الجنسي';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][4];
                             break;
 
                         case 'PHYSICAL5':
-                            $harassmentTypeDetails = 'الاغتصاب';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][5];
                             break;
 
                         case 'PHYSICAL6':
-                            $harassmentTypeDetails = 'التحرش الجماعي';
+                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][6];
                             break;
                         
                         default:
                             $harassmentTypeDetails = '';
                             break;
                     }
-                    $preparedReport .= PHP_EOL . 'تفاصيل اكتر: ' . $harassmentTypeDetails;
+                    $preparedReport .= PHP_EOL . $this->container->translationService->getLocalizedString(
+                        'more_details',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ': ' . $harassmentTypeDetails;
                     break;
 
                 case 'assistence_offered':
                     switch ($value) {
                         case '1':
-                            $assistenceOffered = 'نعم';
+                            $assistenceOffered = $this->container->translationService->getLocalizedString(
+                                'yes',
+                                $this->user->getPreferredLanguage(),
+                                $this->user->getGender()
+                            );
                             break;
 
                         case '0':
-                            $assistenceOffered = 'لا';
+                            $assistenceOffered = $this->container->translationService->getLocalizedString(
+                                'no',
+                                $this->user->getPreferredLanguage(),
+                                $this->user->getGender()
+                            );
                             break;
                         
                         default:
                             $assistenceOffered = '';
                             break;
                     }
-                    $preparedReport .= PHP_EOL . 'هل قام المارة بالتدخل للمساعدة؟ ' . $assistenceOffered;
+                    $preparedReport .= PHP_EOL . $this->container->translationService->getLocalizedString(
+                        'did_anyone_offer_help',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ) . ' ' . $assistenceOffered;
                     break;
                 
                 default:

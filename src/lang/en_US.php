@@ -34,4 +34,9 @@ return [
     'relationship' => 'Relationship to incident?',
     'relationship_personal' => 'Personal',
     'relationship_witness' => 'Witness',
+    'more_details' => 'More details',
+    'report_datetime' => 'Report Time',
+    'relationship_reporting' => 'Relationship of incident reporter',
+    'incident_datetime' => 'Incident Time',
+    'details' => 'Details'
 ];
