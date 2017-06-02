@@ -1,6 +1,7 @@
 <?php
 namespace HarassMapFbMessengerBot\Handler;
 
+use HarassMapFbMessengerBot\User;
 use HarassMapFbMessengerBot\Report;
 use HarassMapFbMessengerBot\Service\ReportService;
 use HarassMapFbMessengerBot\Service\UserService;
@@ -36,7 +37,8 @@ class ReportIncidentHandler implements Handler
 
     public function __construct(
         ContainerInterface $container,
-        CallbackEvent $event
+        CallbackEvent $event,
+        User $user
     ) {
         $this->container = $container;
         $this->event = $event;
@@ -275,7 +277,7 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $webUrl = new WebUrl('إدخل الوقت و التاريخ', 'https://v2.hmfbbot.mtantawy.com/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()]));
+        $webUrl = new WebUrl('إدخل الوقت و التاريخ', 'https://' . $_SERVER['HTTP_HOST'] . '/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()]));
         $webUrl->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_COMPACT);
 
         $elements = [
