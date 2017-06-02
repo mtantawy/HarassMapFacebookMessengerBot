@@ -59,7 +59,13 @@ class GetIncidentsHandler implements Handler
         if (! empty($report)) {
             $report = $this->prepareReport($report);
         } else {
-            $message = new Message('لا يوجد المزيد من التقارير');
+            $message = new Message(
+                $this->container->translationService->getLocalizedString(
+                    'no_more_reports',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                )
+            );
             $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
             return;
         }
@@ -67,9 +73,22 @@ class GetIncidentsHandler implements Handler
         $message = new Message($report);
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $message = new Message('المزيد من التقارير:');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'get_more_reports',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $message->setQuickReplies([
-            new Text('التالى', 'GET_INCIDENTS_OFFSET_' . ($offset + 1)),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'next',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'GET_INCIDENTS_OFFSET_' . ($offset + 1)
+            ),
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);

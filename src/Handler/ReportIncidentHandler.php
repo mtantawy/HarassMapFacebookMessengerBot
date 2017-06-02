@@ -95,20 +95,59 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('تم استلام البلاغ.');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'report_received',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $message = new Message('نشكركم على التصرف بشكل إيجابي وعلى قيامكم بالإبلاغ عن التحرش الجنسي. تساعدنا بلاغاتكم على الحصول على أدلة بالغة الأهمية نستخدمها لإنشاء حملات توعية، وإجراء أبحاث جديدة، وتفعيل برنامجنا "مدارس وجامعات آمنة"، بالإضافة إلى تخطيط وتنفيذ أعمال مجتمعية عديدة في جميع أنحاء مصر من أجل القضاء على التقبل المجتمعي للتحرش والاعتداء الجنسي.');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'thanks_for_reporting',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $message = new Message('للحصول على معلومات عن خدمات قانونية ونفسية مجانية تقدري تتصلي على نظرة للدراسات النسوية على تليفون 0227946992');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'get_help_from_nazra',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
         $elements = [
-            new WebUrl('نظرة للدراسات النسوية', 'http://nazra.org/%D8%A7%D8%AA%D8%B5%D9%84-%D8%A8%D9%86%D8%A7'),
-            new WebUrl('خريطة التحرش', 'http://harassmap.org/ar/contact-us/'),
+            new WebUrl(
+                $this->container->translationService->getLocalizedString(
+                    'nazra_for_feminist_studies',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'http://nazra.org/%D8%A7%D8%AA%D8%B5%D9%84-%D8%A8%D9%86%D8%A7'
+            ),
+            new WebUrl(
+                $this->container->translationService->getLocalizedString(
+                    'harassmap',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'http://harassmap.org/ar/contact-us/'
+            ),
         ];
-        $message = new Button('تواصل معنا للمساعدة:', $elements);
+        $message = new Button(
+            $this->container->translationService->getLocalizedString(
+                'contact_us_for_help',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            ),
+            $elements
+        );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
         $this->reportService->advanceReportStep($report);
@@ -130,7 +169,13 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('ممكن تبعتي مكان الحادثة باستخدام خاصية مشاركة المكان؟');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'can_you_please_share_incident_location',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $message->setQuickReplies([
             new Location(),
         ]);
@@ -156,10 +201,30 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('هل قام المارة بالتدخل للمساعدة؟');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'did_anyone_offer_help',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $message->setQuickReplies([
-            new Text('نعم', 'REPORT_INCIDENT_ASSISTANCE_OFFERED_YES'),
-            new Text('لا', 'REPORT_INCIDENT_ASSISTANCE_OFFERED_NO'),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'yes',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_ASSISTANCE_OFFERED_YES'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'no',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_ASSISTANCE_OFFERED_NO'
+            )
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
@@ -183,7 +248,13 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('برجاء الاختيار:');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'please_choose',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         switch ($harassmentType) {
             case 'VERBAL':
                 $harassmentTypeDetails = [
@@ -214,31 +285,6 @@ class ReportIncidentHandler implements Handler
         $this->reportService->advanceReportStep($report);
     }
 
-    private function saveTime()
-    {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
-        $timeHour = mb_substr($this->event->getQuickReplyPayload(), mb_strlen('REPORT_INCIDENT_TIME_'));
-        $time = new DateTime($timeHour . ':00');
-
-        $this->reportService->saveAnswerToReport(
-            'time',
-            $time->format('H:i:s'),
-            $report
-        );
-
-        $message = new Message('نوع التحرش؟');
-        $message->setQuickReplies([
-            new Text('لفظى', 'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'),
-            new Text('جسدى', 'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'),
-        ]);
-
-        $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
-    }
-
     private function saveDateTime()
     {
         $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
@@ -255,10 +301,30 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('نوع التحرش؟');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'harassment_type',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $message->setQuickReplies([
-            new Text('لفظى', 'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'),
-            new Text('جسدى', 'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'verbal',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'physical',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'
+            )
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
@@ -277,14 +343,35 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $webUrl = new WebUrl('إدخل الوقت و التاريخ', 'https://' . $_SERVER['HTTP_HOST'] . '/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()]));
+        $webUrl = new WebUrl(
+            $this->container->translationService->getLocalizedString(
+                'enter_date_and_time',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            ),
+            'https://' . $_SERVER['HTTP_HOST'] . '/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()])
+        );
         $webUrl->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_COMPACT);
 
         $elements = [
-            new Postback('دلوقتى', 'REPORT_INCIDENT_DATETIME_NOW'),
+            new Postback(
+                $this->container->translationService->getLocalizedString(
+                    'now',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_DATETIME_NOW'
+            ),
             $webUrl,
         ];
-        $message = new Button('امتى حصل التحرش؟', $elements);
+        $message = new Button(
+            $this->container->translationService->getLocalizedString(
+                'when_did_incident_happen',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            ),
+            $elements
+        );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
         $this->reportService->advanceReportStep($report);
@@ -301,7 +388,13 @@ class ReportIncidentHandler implements Handler
             $report
         );
 
-        $message = new Message('من فضلك، أبلغنا عن الواقعة بأكثر قدر ممكن من التفاصيل فى رسالة واحدة.');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'please_explain_incident_in_one_message',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
@@ -314,12 +407,39 @@ class ReportIncidentHandler implements Handler
 
         $this->reportService->startReportForUser($user->getId());
 
-        $response = $this->messenger->sendMessage($this->event->getSenderId(), 'تقدري تبلغي عن حادثة التحرش هنا بسرية تامه.  مش هنحتفظ بأي بيانات او معلومات شخصية ليكي.');
+        $response = $this->messenger->sendMessage(
+            $this->event->getSenderId(),
+            $this->container->translationService->getLocalizedString(
+                'here_you_report_incident_privately_we_donot_store_personal_info',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
 
-        $message = new Message('علاقتك بالبلاغ؟');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'relationship',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $message->setQuickReplies([
-            new Text('حصلي شخصيا', 'REPORT_INCIDENT_RELATIONSHIP_PERSONAL'),
-            new Text('شاهد عليه', 'REPORT_INCIDENT_RELATIONSHIP_WITNESS')
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'relationship_personal',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_RELATIONSHIP_PERSONAL'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'relationship_witness',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_RELATIONSHIP_WITNESS'
+            )
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
