@@ -64,6 +64,9 @@ class ConversationRouter
             || ($event instanceof MessageEvent
             && $event->isQuickReply()
             && $event->getMessage()->hasText())
+            || ($event instanceof MessageEvent
+            && ! $event->isQuickReply()
+            && $event->getMessage()->hasLocation())
         );
     }
 

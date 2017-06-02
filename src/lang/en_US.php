@@ -26,7 +26,7 @@ return [
     'harassment_type' => 'How would you classify the Harassment?',
     'verbal' => 'Verbal',
     'physical' => 'Physical',
-    'enter_date_and_time' => 'Enter incident date and time please.',
+    'enter_date_and_time' => 'Enter incident time please.',
     'now' => 'Just Now',
     'when_did_incident_happen' => 'When did the harassment incident happen?',
     'please_explain_incident_in_one_message' => 'Please explain to us what happened with as much details as possible, in one message.',

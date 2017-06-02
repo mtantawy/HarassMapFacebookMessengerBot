@@ -27,6 +27,8 @@ class ReportIncidentHandler implements Handler
 
     private $event;
 
+    private $user;
+
     private $dbConnection;
 
     private $userService;
@@ -42,6 +44,7 @@ class ReportIncidentHandler implements Handler
     ) {
         $this->container = $container;
         $this->event = $event;
+        $this->user = $user;
         $this->messenger = $this->container->messenger;
         $this->dbConnection = $this->container->dbConnection;
         $this->userService = $this->container->userService;
