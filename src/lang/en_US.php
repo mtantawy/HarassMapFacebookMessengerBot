@@ -38,5 +38,7 @@ return [
     'report_datetime' => 'Report Time',
     'relationship_reporting' => 'Relationship of incident reporter',
     'incident_datetime' => 'Incident Time',
-    'details' => 'Details'
+    'details' => 'Details',
+    'welcome_message' => 'Welcome to HarassMap
+Our mission is to engage all of Egyptian society to create an environment that does not tolerate sexual harassment.'
 ];

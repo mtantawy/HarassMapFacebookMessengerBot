@@ -40,6 +40,15 @@ class GetStartedHandler implements Handler
     {
         $message = new Message(
             $this->container->translationService->getLocalizedString(
+                'welcome_message',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
+        $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
+
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
                 'how_can_i_help_you',
                 $this->user->getPreferredLanguage(),
                 $this->user->getGender()
