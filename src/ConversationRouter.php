@@ -13,6 +13,7 @@ class ConversationRouter
     const HANDLER_GET_STARTED = 'get_started';
     const HANDLER_REPORT_INCIDENT = 'report_incident';
     const HANDLER_GET_INCIDENTS = 'get_reports';
+    const HANDLER_CHANGE_LANGUAGE = 'change_language';
 
     protected $container;
        
@@ -27,12 +28,15 @@ class ConversationRouter
         if ($this->isGetStarted($event, $user)) {
             $this->container->logger->debug(self::HANDLER_GET_STARTED);
             return self::HANDLER_GET_STARTED;
-        } elseif ($this->isReportIncident($event)) {
-            $this->container->logger->debug(self::HANDLER_REPORT_INCIDENT);
-            return self::HANDLER_REPORT_INCIDENT;
-        } elseif ($this->isGetIncidents($event)) {
+        } elseif ($this->isGetIncidents($event, $user)) {
             $this->container->logger->debug(self::HANDLER_GET_INCIDENTS);
             return self::HANDLER_GET_INCIDENTS;
+        } elseif ($this->isChangeLanguage($event, $user)) {
+            $this->container->logger->debug(self::HANDLER_CHANGE_LANGUAGE);
+            return self::HANDLER_CHANGE_LANGUAGE;
+        } elseif ($this->isReportIncident($event, $user)) {
+            $this->container->logger->debug(self::HANDLER_REPORT_INCIDENT);
+            return self::HANDLER_REPORT_INCIDENT;
         }
 
         return '';
@@ -40,7 +44,8 @@ class ConversationRouter
 
     private function isGetStarted(CallbackEvent $event, User $user): bool
     {
-        return (($event instanceof PostbackEvent && $event->getPostbackPayload() === 'GET_STARTED')
+        return (
+            ($event instanceof PostbackEvent && $event->getPostbackPayload() === 'GET_STARTED')
             || ($event instanceof MessageEvent
             && ! $event->isQuickReply()
             && $event->getMessage()->hasText()
@@ -48,20 +53,40 @@ class ConversationRouter
         );
     }
 
-    private function isReportIncident(CallbackEvent $event): bool
+    private function isReportIncident(CallbackEvent $event, User $user): bool
     {
-        return (($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'REPORT_INCIDENT'))
+        return (
+            ($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'REPORT_INCIDENT'))
             || ($event instanceof MessageEvent
-            && 0 !== mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS'))
+            && ! $event->isQuickReply()
+            && $event->getMessage()->hasText()
+            && $this->container->reportService->isUserOnReportDetailsStep($user->getId()))
+            || ($event instanceof MessageEvent
+            && $event->isQuickReply()
+            && $event->getMessage()->hasText())
+            || ($event instanceof MessageEvent
+            && ! $event->isQuickReply()
+            && $event->getMessage()->hasLocation())
         );
     }
 
-    private function isGetIncidents(CallbackEvent $event): bool
+    private function isGetIncidents(CallbackEvent $event, User $user): bool
     {
-        return (($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'GET_INCIDENTS'))
+        return (
+            ($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'GET_INCIDENTS'))
             || $event instanceof MessageEvent
             && $event->isQuickReply()
             && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')
+        );
+    }
+
+    private function isChangeLanguage(CallbackEvent $event, User $user): bool
+    {
+        return (
+            ($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'CHANGE_LANGUAGE'))
+            || $event instanceof MessageEvent
+            && $event->isQuickReply()
+            && 0 === mb_strpos($event->getQuickReplyPayload(), 'CHANGE_LANGUAGE')
         );
     }
 }

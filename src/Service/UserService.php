@@ -97,4 +97,23 @@ class UserService
     {
         return $this->container->messenger->getUserProfile($psid);
     }
+
+    public function updateUserPreferredLanguage(User $user, string $locale)
+    {
+        try {
+            return (bool) $this->container->dbConnection->update(
+                self::TABLE_USERS,
+                [
+                    'preferred_language' => $locale,
+                ],
+                [
+                    'id' => $user->getId(),
+                ]
+            );
+        } catch (Exception $e) {
+            $this->logger->alert($e->getMessage());
+            $this->logger->debug($e->getTraceAsString());
+            return false;
+        }
+    }
 }

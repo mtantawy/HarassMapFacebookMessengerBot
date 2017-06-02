@@ -16,6 +16,25 @@ class Report
     const STEP_LOCATION = 'location';
     const STEP_DONE = 'done';
 
+    const HARASSMENT_TYPES = [
+        'verbal' => [
+            1 => 'النظر المتفحّص',
+            2 => 'التلميحات بالوجه',
+            3 => 'الندءات (البسبسة)',
+            4 => 'التعليقات',
+            5 => 'الملاحقة أو التتبع',
+            6 => 'الدعوة الجنسة',
+        ],
+        'physical' => [
+            1 => 'اللمس',
+            2 => 'التعري',
+            3 => 'التهديد والترهيب',
+            4 => 'الاعتداء الجنسي',
+            5 => 'الاغتصاب',
+            6 => 'التحرش الجماعي',
+        ]
+    ];
+
     const ORDERED_STEPS = [
         self::STEP_INIT,
         self::STEP_RELATION,

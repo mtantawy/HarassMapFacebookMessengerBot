@@ -23,7 +23,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 // new Postback('تغيير اللغة إلى English', 'CHANGE_LANGUAGE'),
-                new Postback('المساعدة', 'GET_STARTED'),
+                new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
                 new Postback('بلغ عن حالة تحرش', 'REPORT_INCIDENT'),
                 new Postback('عرض بلاغات التحرش', 'GET_INCIDENTS'),
             ]
@@ -33,7 +33,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 // new Postback('Change language to العربية', 'CHANGE_LANGUAGE'),
-                new Postback('Get Help', 'GET_STARTED'),
+                new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
                 new Postback('Report Incident', 'REPORT_INCIDENT'),
                 new Postback('View Reviewed Incidents', 'GET_INCIDENTS'),
             ]
@@ -43,7 +43,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 // new Postback('تغيير اللغة إلى English', 'CHANGE_LANGUAGE'),
-                new Postback('المساعدة', 'GET_STARTED'),
+                new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
                 new Postback('بلغ عن حالة تحرش', 'REPORT_INCIDENT'),
                 new Postback('عرض بلاغات التحرش', 'GET_INCIDENTS'),
             ]

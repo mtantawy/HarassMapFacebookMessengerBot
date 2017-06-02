@@ -1,6 +1,7 @@
 <?php
 namespace HarassMapFbMessengerBot\Handler;
 
+use HarassMapFbMessengerBot\User;
 use Tgallice\FBMessenger\Messenger;
 use Tgallice\FBMessenger\Model\Message;
 use Tgallice\FBMessenger\Model\Button\WebUrl;
@@ -13,11 +14,11 @@ use Interop\Container\ContainerInterface;
 
 class GetStartedHandler implements Handler
 {
-    const LOCALE_DEFAULT = 'ar_AR';
-
     private $messenger;
 
     private $event;
+
+    private $user;
 
     private $dbConnection;
 
@@ -25,20 +26,50 @@ class GetStartedHandler implements Handler
 
     public function __construct(
         ContainerInterface $container,
-        CallbackEvent $event
+        CallbackEvent $event,
+        User $user
     ) {
         $this->container = $container;
         $this->event = $event;
+        $this->user = $user;
         $this->messenger = $this->container->messenger;
         $this->dbConnection = $this->container->dbConnection;
     }
 
     public function handle()
     {
-        $message = new Message('أساعدك ازاى؟');
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'how_can_i_help_you',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
         $message->setQuickReplies([
-            new Text('الإبلاغ عن حالة تحرش', 'REPORT_INCIDENT'),
-            new Text('عرض بلاغات التحرش', 'GET_INCIDENTS'),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'view_harassment_incidents',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'GET_INCIDENTS'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'report_harassment_incident',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'change_language',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'CHANGE_LANGUAGE'
+            ),
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
