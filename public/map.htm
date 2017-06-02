@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Map</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <meta charset="utf-8">
+    <style>
+      #map {
+        height: 100%;
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      var map;
+      var queryParams = new URLSearchParams(location.search.slice(1));
+      var lat = Number(queryParams.get('lat') || 28);
+      var lng = Number(queryParams.get('lng') || 31);
+
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: lat, lng: lng},
+          zoom: 6
+        });
+      }
+
+      function getData() {
+          const httpRequest = new XMLHttpRequest();
+          httpRequest.onreadystatechange = function(){
+              if (httpRequest.readyState === XMLHttpRequest.DONE && httpRequest.status === 200) {
+                  const jsonData = JSON.parse(httpRequest.responseText);
+                  console.log(jsonData);
+              } else {
+                  console.log('Error!');
+              }
+          };
+
+          httpRequest.open('GET', `/proxy?lat=${lat}&lng=${lng}`, true);
+          httpRequest.send();
+      }
+
+      getData();
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3&callback=initMap" async defer></script>
+  </body>
+</html>
