@@ -354,7 +354,7 @@ class ReportIncidentHandler implements Handler
             ),
             'https://' . $_SERVER['HTTP_HOST'] . '/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()])
         );
-        $webUrl->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_COMPACT);
+        $webUrl->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_TALL);
 
         $elements = [
             new Postback(

@@ -1,6 +1,12 @@
 <?php
 
 use Tgallice\FBMessenger\Model\Button\Postback;
+use Tgallice\FBMessenger\Model\Button\Nested;
+
+$viewReportsPostbacks = [
+        new Postback('Show Reports / عرض بلاغات', 'GET_INCIDENTS'),
+        new Postback('Show Nearby / عرض بلاغات قريبة', 'GET_INCIDENTS')
+];
 
 return [
     'get_started' => 'GET_STARTED',
@@ -22,30 +28,33 @@ return [
             'locale' => 'default',
             'composer_input_disabled' => false,
             'call_to_actions' => [
-                // new Postback('تغيير اللغة إلى English', 'CHANGE_LANGUAGE'),
-                new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
-                new Postback('بلغ عن حالة تحرش', 'REPORT_INCIDENT'),
-                new Postback('عرض بلاغات التحرش', 'GET_INCIDENTS'),
+                // new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
+                new Postback('Report Incident', 'REPORT_INCIDENT'),
+                // new Postback('View Reviewed Incidents', 'GET_INCIDENTS'),
+                new Nested('Show Incidents / عرض أحداث', $viewReportsPostbacks),
+                new Postback('Language / اللغة', 'CHANGE_LANGUAGE'),
             ]
         ],
         [
             'locale' => 'en_US',
             'composer_input_disabled' => false,
             'call_to_actions' => [
-                // new Postback('Change language to العربية', 'CHANGE_LANGUAGE'),
-                new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
+                // new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
                 new Postback('Report Incident', 'REPORT_INCIDENT'),
-                new Postback('View Reviewed Incidents', 'GET_INCIDENTS'),
+                // new Postback('View Reviewed Incidents', 'GET_INCIDENTS'),
+                new Nested('Show Incidents / عرض أحداث', $viewReportsPostbacks),
+                new Postback('Language / اللغة', 'CHANGE_LANGUAGE'),
             ]
         ],
         [
             'locale' => 'ar_AR',
             'composer_input_disabled' => false,
             'call_to_actions' => [
-                // new Postback('تغيير اللغة إلى English', 'CHANGE_LANGUAGE'),
-                new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
+                // new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
                 new Postback('بلغ عن حالة تحرش', 'REPORT_INCIDENT'),
-                new Postback('عرض بلاغات التحرش', 'GET_INCIDENTS'),
+                // new Postback('عرض بلاغات التحرش', 'GET_INCIDENTS'),
+                new Nested('Show Incidents / عرض أحداث', $viewReportsPostbacks),
+                new Postback('اللغة / Language', 'CHANGE_LANGUAGE'),
             ]
         ],
     ]
