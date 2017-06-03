@@ -13,6 +13,7 @@ class ConversationRouter
     const HANDLER_GET_STARTED = 'get_started';
     const HANDLER_REPORT_INCIDENT = 'report_incident';
     const HANDLER_GET_INCIDENTS = 'get_reports';
+    const HANDLER_GET_NEARBY_INCIDENTS = 'get_nearby_reports';
     const HANDLER_CHANGE_LANGUAGE = 'change_language';
 
     protected $container;
@@ -31,6 +32,9 @@ class ConversationRouter
         } elseif ($this->isGetIncidents($event, $user)) {
             $this->container->logger->debug(self::HANDLER_GET_INCIDENTS);
             return self::HANDLER_GET_INCIDENTS;
+        } elseif ($this->isGetNearbyIncidents($event, $user)) {
+            $this->container->logger->debug(self::HANDLER_GET_NEARBY_INCIDENTS);
+            return self::HANDLER_GET_NEARBY_INCIDENTS;
         } elseif ($this->isChangeLanguage($event, $user)) {
             $this->container->logger->debug(self::HANDLER_CHANGE_LANGUAGE);
             return self::HANDLER_CHANGE_LANGUAGE;
@@ -77,6 +81,19 @@ class ConversationRouter
             || $event instanceof MessageEvent
             && $event->isQuickReply()
             && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_INCIDENTS')
+        );
+    }
+
+    private function isGetNearbyIncidents(CallbackEvent $event, User $user): bool
+    {
+        return (
+            ($event instanceof PostbackEvent && 0 === mb_strpos($event->getPostbackPayload(), 'GET_NEARBY_INCIDENTS'))
+            || $event instanceof MessageEvent
+            && $event->isQuickReply()
+            && 0 === mb_strpos($event->getQuickReplyPayload(), 'GET_NEARBY_INCIDENTS')
+            || ($event instanceof MessageEvent
+            && ! $event->isQuickReply() && $event->getMessage()->hasLocation()
+            && ! $this->container->reportService->isUserOnReportLocationStep($user->getId()))
         );
     }
 

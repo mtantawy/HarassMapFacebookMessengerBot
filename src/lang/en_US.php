@@ -3,6 +3,7 @@
 return [
     'how_can_i_help_you' => 'How can i help you?',
     'view_harassment_incidents' => 'View Incidents',
+    'view_nearby_harassment_incidents' => 'View Nearby Incidents',
     'report_harassment_incident' => 'Report Incident',
     'change_language' => 'Change Language',
     'choose_language' => 'Choose Language:',
@@ -19,6 +20,7 @@ return [
     'harassmap' => 'HarassMap',
     'contact_us_for_help' => 'Contact us for help:',
     'can_you_please_share_incident_location' => 'Can you please share incident location using location sharing feature?',
+    'can_you_please_share_your_location' => 'Can you please share your location using location sharing feature?',
     'did_anyone_offer_help' => 'Did bystanders intervene to help?',
     'yes' => 'Yes',
     'no' => 'No',
@@ -40,5 +42,7 @@ return [
     'incident_datetime' => 'Incident Time',
     'details' => 'Details',
     'welcome_message' => 'Welcome to HarassMap
-Our mission is to engage all of Egyptian society to create an environment that does not tolerate sexual harassment.'
+Our mission is to engage all of Egyptian society to create an environment that does not tolerate sexual harassment.',
+    'view_incidents_near_your_location' => 'Incidents near you',
+    'view' => 'View'
 ];

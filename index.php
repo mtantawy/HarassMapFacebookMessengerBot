@@ -17,6 +17,7 @@ use HarassMapFbMessengerBot\ConversationRouter;
 use HarassMapFbMessengerBot\Handler\GetStartedHandler;
 use HarassMapFbMessengerBot\Handler\ReportIncidentHandler;
 use HarassMapFbMessengerBot\Handler\GetIncidentsHandler;
+use HarassMapFbMessengerBot\Handler\GetNearbyIncidentsHandler;
 use HarassMapFbMessengerBot\Handler\ChangeLanguageHandler;
 use HarassMapFbMessengerBot\Middleware\UserMiddleware;
 use HarassMapFbMessengerBot\Service\UserService;
@@ -100,6 +101,10 @@ $app->post('/', function (Request $request, Response $response) {
 
                 case $this->conversationRouter::HANDLER_GET_INCIDENTS:
                        $eventHandler = new GetIncidentsHandler($this, $event, $user);
+                    break;
+
+                case $this->conversationRouter::HANDLER_GET_NEARBY_INCIDENTS:
+                       $eventHandler = new GetNearbyIncidentsHandler($this, $event, $user);
                     break;
 
                 case $this->conversationRouter::HANDLER_CHANGE_LANGUAGE:

@@ -65,6 +65,14 @@ class GetStartedHandler implements Handler
             ),
             new Text(
                 $this->container->translationService->getLocalizedString(
+                    'view_nearby_harassment_incidents',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'GET_NEARBY_INCIDENTS'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
                     'report_harassment_incident',
                     $this->user->getPreferredLanguage(),
                     $this->user->getGender()

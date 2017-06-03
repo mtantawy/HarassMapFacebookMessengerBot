@@ -27,6 +27,16 @@ class ReportService
         return (bool) $result['reports_count'];
     }
 
+    public function isUserOnReportLocationStep(int $userId): bool
+    {
+        $result = $this->container->dbConnection->fetchAssoc(
+            'SELECT count(*) as `reports_count` FROM `' . self::TABLE_REPORTS . '` WHERE `user_id` = ? AND `step` = ?',
+            [$userId, Report::STEP_LOCATION]
+        );
+
+        return (bool) $result['reports_count'];
+    }
+
     public function setDatetimeForUserReport(string $userId, string $reportId, string $datetime): bool
     {
         try {

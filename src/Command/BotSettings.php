@@ -5,7 +5,7 @@ use Tgallice\FBMessenger\Model\Button\Nested;
 
 $viewReportsPostbacks = [
         new Postback('Show Reports / عرض بلاغات', 'GET_INCIDENTS'),
-        new Postback('Show Nearby / عرض بلاغات قريبة', 'GET_INCIDENTS')
+        new Postback('Show Nearby / عرض بلاغات قريبة', 'GET_NEARBY_INCIDENTS')
 ];
 
 return [
