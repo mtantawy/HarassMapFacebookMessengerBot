@@ -28,10 +28,30 @@ class ReportController
             $ids['report_id'],
             $datetime
         )) {
-            $message = new Message('نوع التحرش؟');
+            $message = new Message(
+                $this->container->translationService->getLocalizedString(
+                    'harassment_type',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                )
+            );
             $message->setQuickReplies([
-                new Text('لفظى', 'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'),
-                new Text('جسدى', 'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'),
+                new Text(
+                    $this->container->translationService->getLocalizedString(
+                        'verbal',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ),
+                    'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'
+                ),
+                new Text(
+                    $this->container->translationService->getLocalizedString(
+                        'physical',
+                        $this->user->getPreferredLanguage(),
+                        $this->user->getGender()
+                    ),
+                    'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'
+                )
             ]);
 
             $this->container->messenger->sendMessage(
