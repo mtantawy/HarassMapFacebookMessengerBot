@@ -335,8 +335,9 @@ class ReportIncidentHandler implements Handler
         $this->reportService->advanceReportStep($this->report);
     }
 
-    private function triggerHarassmentTypeDetails(string $harassmentType)
+    private function triggerHarassmentTypeDetails()
     {
+        $harassmentType = $this->report->getHarassmentType();
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'please_choose',
@@ -347,23 +348,59 @@ class ReportIncidentHandler implements Handler
         switch ($harassmentType) {
             case 'VERBAL':
                 $harassmentTypeDetails = [
-                    new Text(Report::HARASSMENT_TYPES['verbal'][1], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL1'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][2], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL2'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][3], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL3'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][4], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL4'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][5], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL5'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][6], 'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL6'),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['verbal'][1]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL1'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['verbal'][2]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL2'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['verbal'][3]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL3'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['verbal'][4]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL4'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['verbal'][5]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL5'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['verbal'][6]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_VERBAL6'
+                    ),
                 ];
                 break;
 
             case 'PHYSICAL':
                 $harassmentTypeDetails = [
-                    new Text(Report::HARASSMENT_TYPES['physical'][1], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL1'),
-                    new Text(Report::HARASSMENT_TYPES['physical'][2], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL2'),
-                    new Text(Report::HARASSMENT_TYPES['physical'][3], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL3'),
-                    new Text(Report::HARASSMENT_TYPES['physical'][4], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL4'),
-                    new Text(Report::HARASSMENT_TYPES['physical'][5], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL5'),
-                    new Text(Report::HARASSMENT_TYPES['physical'][6], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL6'),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['physical'][1]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL1'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['physical'][2]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL2'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['physical'][3]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL3'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['physical'][4]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL4'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['physical'][5]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL5'
+                    ),
+                    new Text(
+                        $this->translate(Report::HARASSMENT_TYPES['physical'][6]),
+                        'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL6'
+                    ),
                 ];
                 break;
         }
@@ -539,5 +576,14 @@ class ReportIncidentHandler implements Handler
     private function triggerInit()
     {
         $this->triggerRelation();
+    }
+
+    private function translate(string $string): string
+    {
+        return $this->container->translationService->getLocalizedString(
+            $string,
+            $this->user->getPreferredLanguage(),
+            $this->user->getGender()
+        );
     }
 }

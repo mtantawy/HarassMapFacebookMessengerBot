@@ -188,51 +188,51 @@ class GetIncidentsHandler implements Handler
                 case 'harassment_type_details':
                     switch ($value) {
                         case 'VERBAL1':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][1];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['verbal'][1]);
                             break;
 
                         case 'VERBAL2':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][2];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['verbal'][2]);
                             break;
 
                         case 'VERBAL3':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][3];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['verbal'][3]);
                             break;
 
                         case 'VERBAL4':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][4];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['verbal'][4]);
                             break;
 
                         case 'VERBAL5':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][5];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['verbal'][5]);
                             break;
 
                         case 'VERBAL6':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['verbal'][6];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['verbal'][6]);
                             break;
 
                         case 'PHYSICAL1':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][1];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['physical'][1]);
                             break;
 
                         case 'PHYSICAL2':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][2];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['physical'][2]);
                             break;
 
                         case 'PHYSICAL3':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][3];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['physical'][3]);
                             break;
 
                         case 'PHYSICAL4':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][4];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['physical'][4]);
                             break;
 
                         case 'PHYSICAL5':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][5];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['physical'][5]);
                             break;
 
                         case 'PHYSICAL6':
-                            $harassmentTypeDetails = Report::HARASSMENT_TYPES['physical'][6];
+                            $harassmentTypeDetails = $this->translate(Report::HARASSMENT_TYPES['physical'][6]);
                             break;
                         
                         default:
@@ -292,5 +292,14 @@ class GetIncidentsHandler implements Handler
         );
 
         return is_array($report) ? $report : [];
+    }
+
+    private function translate(string $string): string
+    {
+        return $this->container->translationService->getLocalizedString(
+            $string,
+            $this->user->getPreferredLanguage(),
+            $this->user->getGender()
+        );
     }
 }

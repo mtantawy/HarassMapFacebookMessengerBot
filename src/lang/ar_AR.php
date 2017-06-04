@@ -68,5 +68,17 @@ return [
     'view' => 'إعرض',
     'resume_or_new_report' => 'هل تود استكمال التقرير؟',
     'resume' => 'اسكتمال التقرير',
-    'new' => 'إبدأ تقرير جديد'
+    'new' => 'إبدأ تقرير جديد',
+    'ogling' => 'النظر المتفحّص',
+    'facial_expressions' => 'التلميحات بالوجه',
+    'catcalls' => 'النداءات (البسبسة)',
+    'comments' => 'التعليقات',
+    'stalking_or_following' => 'الملاحقة أو التتبع',
+    'sexual_invites' => 'الدعوة الجنسية',
+    'touching' => 'اللمس',
+    'indecent_exposure' => 'التعري',
+    'threat' => 'التهديد والترهيب',
+    'sexual_assault' => 'الاعتداء الجنسي',
+    'rape' => 'الاغتصاب',
+    'mob_attacks' => 'التحرش الجماعي',
 ];

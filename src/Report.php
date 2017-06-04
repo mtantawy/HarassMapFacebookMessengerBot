@@ -18,20 +18,20 @@ class Report
 
     const HARASSMENT_TYPES = [
         'verbal' => [
-            1 => 'النظر المتفحّص',
-            2 => 'التلميحات بالوجه',
-            3 => 'النداءات (البسبسة)',
-            4 => 'التعليقات',
-            5 => 'الملاحقة أو التتبع',
-            6 => 'الدعوة الجنسية',
+            1 => 'ogling',
+            2 => 'facial_expressions',
+            3 => 'catcalls',
+            4 => 'comments',
+            5 => 'stalking_or_following',
+            6 => 'sexual_invites',
         ],
         'physical' => [
-            1 => 'اللمس',
-            2 => 'التعري',
-            3 => 'التهديد والترهيب',
-            4 => 'الاعتداء الجنسي',
-            5 => 'الاغتصاب',
-            6 => 'التحرش الجماعي',
+            1 => 'touching',
+            2 => 'indecent_exposure',
+            3 => 'threat',
+            4 => 'sexual_assault',
+            5 => 'rape',
+            6 => 'mob_attacks',
         ]
     ];
 

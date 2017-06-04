@@ -28,34 +28,38 @@ class ReportController
             $ids['report_id'],
             $datetime
         )) {
+            $report = $this->container->reportService->getInProgressReportByUser($ids['user_id']);
+            $user = $this->container->userService->getById($ids['user_id']);
+            $this->container->reportService->advanceReportStep($report);
+
             $message = new Message(
                 $this->container->translationService->getLocalizedString(
                     'harassment_type',
-                    $this->user->getPreferredLanguage(),
-                    $this->user->getGender()
+                    $user->getPreferredLanguage(),
+                    $user->getGender()
                 )
             );
             $message->setQuickReplies([
                 new Text(
                     $this->container->translationService->getLocalizedString(
                         'verbal',
-                        $this->user->getPreferredLanguage(),
-                        $this->user->getGender()
+                        $user->getPreferredLanguage(),
+                        $user->getGender()
                     ),
                     'REPORT_INCIDENT_HARASSMENT_TYPE_VERBAL'
                 ),
                 new Text(
                     $this->container->translationService->getLocalizedString(
                         'physical',
-                        $this->user->getPreferredLanguage(),
-                        $this->user->getGender()
+                        $user->getPreferredLanguage(),
+                        $user->getGender()
                     ),
                     'REPORT_INCIDENT_HARASSMENT_TYPE_PHYSICAL'
                 )
             ]);
 
             $this->container->messenger->sendMessage(
-                $this->container->userService->getById($ids['user_id'])->getPsid(),
+                $user->getPsid(),
                 $message
             );
 
