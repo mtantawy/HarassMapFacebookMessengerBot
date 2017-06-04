@@ -119,4 +119,14 @@ class ReportService
             'step' => Report::STEP_INIT,
         ]);
     }
+
+    public function deleteReportsForUser(int $userId): bool
+    {
+        return (bool) $this->container->dbConnection->delete(
+            self::TABLE_REPORTS,
+            [
+                'user_id' => $userId
+            ]
+        );
+    }
 }

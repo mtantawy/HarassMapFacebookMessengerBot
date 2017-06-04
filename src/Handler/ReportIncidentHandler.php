@@ -29,6 +29,8 @@ class ReportIncidentHandler implements Handler
 
     private $user;
 
+    private $report;
+
     private $dbConnection;
 
     private $userService;
@@ -49,6 +51,12 @@ class ReportIncidentHandler implements Handler
         $this->dbConnection = $this->container->dbConnection;
         $this->userService = $this->container->userService;
         $this->reportService = $this->container->reportService;
+
+        try {
+            $this->report = $this->reportService->getInProgressReportByUser($user->getId());
+        } catch (Exception $e) {
+            //
+        }
     }
 
     public function handle()
@@ -57,45 +65,121 @@ class ReportIncidentHandler implements Handler
             && $this->event->getQuickReplyPayload() === 'REPORT_INCIDENT')
             || ($this->event instanceof PostbackEvent
             && $this->event->getPostbackPayload() === 'REPORT_INCIDENT')) {
-            $this->startReport();
+            if ($this->canStartReport()) {
+                $this->startReport();
+                $this->triggerRelation();
+            } else {
+                $this->offerToRestartOrResumeReport();
+            }
+        } elseif ($this->event instanceof MessageEvent
+            && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_ACTION')) {
+            $this->restartOrResumeReport();
         } elseif ($this->event instanceof MessageEvent
             && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_RELATIONSHIP')) {
             $this->saveRelationship();
+            $this->triggerDetails();
         } elseif ($this->event instanceof MessageEvent
             && ! $this->event->isQuickReply() && $this->event->getMessage()->hasText()) {
             $this->saveDetails();
+            $this->triggerDateTime();
         } elseif ($this->event instanceof PostbackEvent
             && 0 === mb_strpos($this->event->getPostbackPayload(), 'REPORT_INCIDENT_DATETIME')) {
             $this->saveDateTime();
+            $this->triggerHarassmentType();
         } elseif ($this->event instanceof MessageEvent
             && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_TYPE')) {
             $this->saveHarassmentType();
+            $harassmentType = mb_substr(
+                $this->event->getQuickReplyPayload(),
+                mb_strlen('REPORT_INCIDENT_HARASSMENT_TYPE_')
+            );
+            $this->triggerHarassmentTypeDetails($harassmentType);
         } elseif ($this->event instanceof MessageEvent
             && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_HARASSMENT_DETAILS')) {
-            $this->saveHarassmentDetails();
+            $this->saveHarassmentTypeDetails();
+            $this->triggerAssistanceOffered();
         } elseif ($this->event instanceof MessageEvent
             && 0 === mb_strpos($this->event->getQuickReplyPayload(), 'REPORT_INCIDENT_ASSISTANCE_OFFERED')) {
             $this->saveAssistanceOffered();
+            $this->triggerLocation();
         } elseif ($this->event instanceof MessageEvent
             && ! $this->event->isQuickReply() && $this->event->getMessage()->hasLocation()) {
             $this->saveLocation();
         }
     }
 
+    private function restartOrResumeReport()
+    {
+        $action = mb_substr($this->event->getQuickReplyPayload(), mb_strlen('REPORT_INCIDENT_ACTION_'));
+
+        switch ($action) {
+            case 'RESUME':
+                if ($this->canStartReport()) {
+                     $this->startReport();
+                    $this->triggerRelation();
+                }
+                $step = $this->report->getStep();
+                $pascalCaseStep = str_replace(' ', '', ucwords(str_replace('_', ' ', $step)));
+                $stepMethod = 'trigger' . $pascalCaseStep;
+                $this->$stepMethod();
+                break;
+
+            case 'NEW':
+            default:
+                $this->reportService->deleteReportsForUser($this->user->getId());
+                $this->startReport();
+                $this->triggerRelation();
+                break;
+        }
+    }
+
+    private function canStartReport(): bool
+    {
+        return (is_null($this->report) && ! $this->report instanceof Report);
+    }
+
+    private function offerToRestartOrResumeReport()
+    {
+        $message = new Message(
+            $this->container->translationService->getLocalizedString(
+                'resume_or_new_report',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
+        $message->setQuickReplies([
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'resume',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_ACTION_RESUME'
+            ),
+            new Text(
+                $this->container->translationService->getLocalizedString(
+                    'new',
+                    $this->user->getPreferredLanguage(),
+                    $this->user->getGender()
+                ),
+                'REPORT_INCIDENT_ACTION_NEW'
+            )
+        ]);
+
+        $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
+    }
+
     private function saveLocation()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
         $this->reportService->saveAnswerToReport(
             'latitude',
             $this->event->getMessage()->getLatitude(),
-            $report
+            $this->report
         );
         $this->reportService->saveAnswerToReport(
             'longitude',
             $this->event->getMessage()->getLongitude(),
-            $report
+            $this->report
         );
 
         $message = new Message(
@@ -153,25 +237,11 @@ class ReportIncidentHandler implements Handler
         );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
 
-        $this->reportService->advanceReportStep($report);
+        $this->reportService->advanceReportStep($this->report);
     }
 
-    private function saveAssistanceOffered()
+    private function triggerLocation()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
-        $assistenceOffered = mb_substr(
-            $this->event->getQuickReplyPayload(),
-            mb_strlen('REPORT_INCIDENT_ASSISTANCE_OFFERED_')
-        );
-
-        $this->reportService->saveAnswerToReport(
-            'assistence_offered',
-            $assistenceOffered === 'YES' ? 1 : 0,
-            $report
-        );
-
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'can_you_please_share_incident_location',
@@ -184,15 +254,26 @@ class ReportIncidentHandler implements Handler
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
     }
 
-    private function saveHarassmentDetails()
+    private function saveAssistanceOffered()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
+        $assistenceOffered = mb_substr(
+            $this->event->getQuickReplyPayload(),
+            mb_strlen('REPORT_INCIDENT_ASSISTANCE_OFFERED_')
+        );
 
+        $this->reportService->saveAnswerToReport(
+            'assistence_offered',
+            $assistenceOffered === 'YES' ? 1 : 0,
+            $this->report
+        );
+
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function saveHarassmentTypeDetails()
+    {
         $harassmentDetails = mb_substr(
             $this->event->getQuickReplyPayload(),
             mb_strlen('REPORT_INCIDENT_HARASSMENT_DETAILS_')
@@ -201,9 +282,14 @@ class ReportIncidentHandler implements Handler
         $this->reportService->saveAnswerToReport(
             'harassment_type_details',
             $harassmentDetails,
-            $report
+            $this->report
         );
 
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function triggerAssistanceOffered()
+    {
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'did_anyone_offer_help',
@@ -231,15 +317,10 @@ class ReportIncidentHandler implements Handler
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
     }
 
     private function saveHarassmentType()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
         $harassmentType = mb_substr(
             $this->event->getQuickReplyPayload(),
             mb_strlen('REPORT_INCIDENT_HARASSMENT_TYPE_')
@@ -248,9 +329,14 @@ class ReportIncidentHandler implements Handler
         $this->reportService->saveAnswerToReport(
             'harassment_type',
             $harassmentType,
-            $report
+            $this->report
         );
 
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function triggerHarassmentTypeDetails(string $harassmentType)
+    {
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'please_choose',
@@ -284,15 +370,10 @@ class ReportIncidentHandler implements Handler
         $message->setQuickReplies($harassmentTypeDetails);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
     }
 
     private function saveDateTime()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
         if ($this->event->getPostbackPayload() === 'REPORT_INCIDENT_DATETIME_NOW') {
             $datetime = new DateTime();
             $datetime = $datetime->format('Y-m-d H:i:s');
@@ -301,9 +382,14 @@ class ReportIncidentHandler implements Handler
         $this->reportService->saveAnswerToReport(
             'datetime',
             $datetime,
-            $report
+            $this->report
         );
 
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function triggerHarassmentType()
+    {
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'harassment_type',
@@ -331,28 +417,28 @@ class ReportIncidentHandler implements Handler
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
     }
 
     private function saveDetails()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
         $this->reportService->saveAnswerToReport(
             'details',
             $this->event->getMessageText(),
-            $report
+            $this->report
         );
 
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function triggerDateTime()
+    {
         $webUrl = new WebUrl(
             $this->container->translationService->getLocalizedString(
                 'enter_date_and_time',
                 $this->user->getPreferredLanguage(),
                 $this->user->getGender()
             ),
-            'https://' . $_SERVER['HTTP_HOST'] . '/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $user->getId(), 'report_id' => $report->getId()])
+            'https://' . $_SERVER['HTTP_HOST'] . '/public/datetimepicker.htm?ids=' . json_encode(['user_id' => $this->user->getId(), 'report_id' => $this->report->getId()])
         );
         $webUrl->setWebviewHeightRatio(WebUrl::HEIGHT_RATIO_TALL);
 
@@ -376,21 +462,21 @@ class ReportIncidentHandler implements Handler
             $elements
         );
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
     }
 
     private function saveRelationship()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-        $report = $this->reportService->getInProgressReportByUser($user->getId());
-
         $this->reportService->saveAnswerToReport(
             'relation',
             mb_substr($this->event->getQuickReplyPayload(), mb_strlen('REPORT_INCIDENT_RELATIONSHIP_')),
-            $report
+            $this->report
         );
 
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function triggerDetails()
+    {
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'please_explain_incident_in_one_message',
@@ -400,25 +486,10 @@ class ReportIncidentHandler implements Handler
         );
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
-
-        $this->reportService->advanceReportStep($report);
     }
 
-    private function startReport()
+    private function triggerRelation()
     {
-        $user = $this->userService->getUserByFacebookPSID($this->event->getSenderId());
-
-        $this->reportService->startReportForUser($user->getId());
-
-        $response = $this->messenger->sendMessage(
-            $this->event->getSenderId(),
-            $this->container->translationService->getLocalizedString(
-                'here_you_report_incident_privately_we_donot_store_personal_info',
-                $this->user->getPreferredLanguage(),
-                $this->user->getGender()
-            )
-        );
-
         $message = new Message(
             $this->container->translationService->getLocalizedString(
                 'relationship',
@@ -446,7 +517,27 @@ class ReportIncidentHandler implements Handler
         ]);
 
         $response = $this->messenger->sendMessage($this->event->getSenderId(), $message);
+    }
 
-        $this->reportService->advanceReportStep($this->reportService->getInProgressReportByUser($user->getId()));
+    private function startReport()
+    {
+        $this->reportService->startReportForUser($this->user->getId());
+        $this->report = $this->reportService->getInProgressReportByUser($this->user->getId());
+
+        $response = $this->messenger->sendMessage(
+            $this->event->getSenderId(),
+            $this->container->translationService->getLocalizedString(
+                'here_you_report_incident_privately_we_donot_store_personal_info',
+                $this->user->getPreferredLanguage(),
+                $this->user->getGender()
+            )
+        );
+
+        $this->reportService->advanceReportStep($this->report);
+    }
+
+    private function triggerInit()
+    {
+        $this->triggerRelation();
     }
 }

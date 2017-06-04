@@ -29,8 +29,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 // new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
-                new Postback('Report Incident', 'REPORT_INCIDENT'),
-                // new Postback('View Reviewed Incidents', 'GET_INCIDENTS'),
+                new Postback('Report Incident / بلغ عن تحرش', 'REPORT_INCIDENT'),
                 new Nested('Show Incidents / عرض أحداث', $viewReportsPostbacks),
                 new Postback('Language / اللغة', 'CHANGE_LANGUAGE'),
             ]
@@ -40,8 +39,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 // new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
-                new Postback('Report Incident', 'REPORT_INCIDENT'),
-                // new Postback('View Reviewed Incidents', 'GET_INCIDENTS'),
+                new Postback('Report Incident / بلغ عن تحرش', 'REPORT_INCIDENT'),
                 new Nested('Show Incidents / عرض أحداث', $viewReportsPostbacks),
                 new Postback('Language / اللغة', 'CHANGE_LANGUAGE'),
             ]
@@ -51,8 +49,7 @@ return [
             'composer_input_disabled' => false,
             'call_to_actions' => [
                 // new Postback('Get Help/طلب المساعدة', 'GET_STARTED'),
-                new Postback('بلغ عن حالة تحرش', 'REPORT_INCIDENT'),
-                // new Postback('عرض بلاغات التحرش', 'GET_INCIDENTS'),
+                new Postback('Report Incident / بلغ عن تحرش', 'REPORT_INCIDENT'),
                 new Nested('Show Incidents / عرض أحداث', $viewReportsPostbacks),
                 new Postback('اللغة / Language', 'CHANGE_LANGUAGE'),
             ]
