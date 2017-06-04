@@ -272,12 +272,12 @@ class ReportIncidentHandler implements Handler
 
             case 'PHYSICAL':
                 $harassmentTypeDetails = [
-                    new Text(Report::HARASSMENT_TYPES['verbal'][1], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL1'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][2], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL2'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][3], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL3'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][4], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL4'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][5], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL5'),
-                    new Text(Report::HARASSMENT_TYPES['verbal'][6], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL6'),
+                    new Text(Report::HARASSMENT_TYPES['physical'][1], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL1'),
+                    new Text(Report::HARASSMENT_TYPES['physical'][2], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL2'),
+                    new Text(Report::HARASSMENT_TYPES['physical'][3], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL3'),
+                    new Text(Report::HARASSMENT_TYPES['physical'][4], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL4'),
+                    new Text(Report::HARASSMENT_TYPES['physical'][5], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL5'),
+                    new Text(Report::HARASSMENT_TYPES['physical'][6], 'REPORT_INCIDENT_HARASSMENT_DETAILS_PHYSICAL6'),
                 ];
                 break;
         }
