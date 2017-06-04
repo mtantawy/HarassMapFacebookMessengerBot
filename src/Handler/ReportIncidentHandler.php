@@ -126,7 +126,7 @@ class ReportIncidentHandler implements Handler
 
             case 'NEW':
             default:
-                $this->reportService->deleteReportsForUser($this->user->getId());
+                $this->reportService->deleteNotDoneReportsForUser($this->user->getId());
                 $this->startReport();
                 $this->triggerRelation();
                 break;

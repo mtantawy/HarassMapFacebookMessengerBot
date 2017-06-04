@@ -120,13 +120,11 @@ class ReportService
         ]);
     }
 
-    public function deleteReportsForUser(int $userId): bool
+    public function deleteNotDoneReportsForUser(int $userId): bool
     {
-        return (bool) $this->container->dbConnection->delete(
-            self::TABLE_REPORTS,
-            [
-                'user_id' => $userId
-            ]
-        );
+        return (bool) $this->container->dbConnection->executeQuery(
+            'DELETE FROM `reports` WHERE `user_id` = ? AND `step` != "' . Report::STEP_DONE . '"',
+            [$userId]
+        )->rowCount();
     }
 }
