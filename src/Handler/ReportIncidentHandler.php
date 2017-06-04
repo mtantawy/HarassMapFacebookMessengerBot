@@ -337,6 +337,7 @@ class ReportIncidentHandler implements Handler
 
     private function triggerHarassmentTypeDetails()
     {
+        $this->report = $this->reportService->getInProgressReportByUser($this->user->getId());
         $harassmentType = $this->report->getHarassmentType();
         $message = new Message(
             $this->container->translationService->getLocalizedString(

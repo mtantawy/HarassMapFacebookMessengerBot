@@ -52,7 +52,7 @@ Our mission is to engage all of Egyptian society to create an environment that d
     'facial_expressions' => 'Facial Expressions',
     'catcalls' => 'Catcalls',
     'comments' => 'Comments',
-    'stalking_or_following' => 'Stalking or Following',
+    'stalking_or_following' => 'Stalking / Following',
     'sexual_invites' => 'Sexual Invites',
     'touching' => 'Touching',
     'indecent_exposure' => 'Indecent Exposure',
