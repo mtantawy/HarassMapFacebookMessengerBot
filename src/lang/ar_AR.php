@@ -3,7 +3,7 @@
 return [
     'how_can_i_help_you' => 'أساعدك ازاى؟',
     'view_harassment_incidents' => 'عرض بلاغات التحرش',
-    'view_nearby_harassment_incidents' => 'عرض بلاغات التحرش القريبة',
+    'view_nearby_harassment_incidents' => 'عرض البلاغات القريبة',
     'report_harassment_incident' => 'الإبلاغ عن حالة تحرش',
     'change_language' => 'تغيير اللغة',
     'choose_language' => 'إختر اللغة:',
@@ -66,4 +66,7 @@ return [
 هدفنا هو خلق بيئة رافضة للتحرش الجنسي في مصر عن طريق حملات توعية فى المناطق التي يكثر بها التحرش',
     'view_incidents_near_your_location' => 'بلاغات تحرش قريبة منك',
     'view' => 'إعرض',
+    'resume_or_new_report' => 'هل تود استكمال التقرير؟',
+    'resume' => 'اسكتمال التقرير',
+    'new' => 'إبدأ تقرير جديد'
 ];
