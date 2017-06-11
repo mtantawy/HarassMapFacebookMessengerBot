@@ -18,6 +18,9 @@
     </style>
   </head>
   <body>
+    <h1 class="page__title" style="text-align: center;">
+        Drag the green marker to change your location
+    </h1>
     <div id="map"></div>
     <script id="marker-template" type="text/template">
         <div class="weui-cells__title">${locationname}</div>
@@ -55,21 +58,31 @@
             lat = event.latLng.lat();
             lng = event.latLng.lng();
 
-            setTimeout(() => {
-                getData().then(renderMarkers);
-            }, 0);
+            setTimeout(fetctNearbyIncidents, 0);
         });
       }
 
-      function getData() {
+      function fetctNearbyIncidents() {
+          getIncidentsData()
+            .then(renderMarkers)
+            .catch((error) => {
+                console.error(error);
+                clearMarkers();
+            });
+      }
+
+      function getIncidentsData() {
           return new Promise((resolve, reject) => {
               const httpRequest = new XMLHttpRequest();
               httpRequest.onreadystatechange = function(){
                   if (httpRequest.readyState === XMLHttpRequest.DONE) {
                       if (httpRequest.status === 200) {
-                          const jsonData = JSON.parse(httpRequest.responseText);
-                          if (jsonData && jsonData.payload && jsonData.payload.incidents) {
+                          const jsonData = JSON.parse(httpRequest.responseText) || {};
+                          const error = jsonData.error || {};
+                          if (error.code === '0' && jsonData.payload && jsonData.payload.incidents) {
                               return resolve(jsonData.payload.incidents);
+                          } else {
+                              return reject(new Error('No incidents nearby'));
                           }
                       } else {
                         return reject(new Error('Could not load data'));
@@ -82,7 +95,7 @@
           });
       }
 
-      getData().then(renderMarkers);
+      fetctNearbyIncidents();
 
       const template = document.getElementById('marker-template').innerText;
       function getMarkerContent(incident) {
@@ -92,16 +105,20 @@
           }, template);
       }
 
-      function renderMarkers(incidents) {
-        const bounds = new google.maps.LatLngBounds();
-        const openWindows = [];
-
+      function clearMarkers() {
         if (markers.length > 0) {
             markers.forEach((marker) => {
                 marker.setMap(null);
                 marker = null;
             });
         }
+      }
+
+      function renderMarkers(incidents) {
+        const bounds = new google.maps.LatLngBounds();
+        const openWindows = [];
+
+        clearMarkers();
 
         incidents.forEach((incident) => {
             const incidentDetails = incident.incident;
