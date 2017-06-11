@@ -72,7 +72,7 @@ $app->get('/', function (Request $request, Response $response) {
 
 $app->get('/proxy', function (Request $request, Response $response) {
     $queryParams = $request->getQueryParams();
-    $apiResponse = file_get_contents('https://maps.harassmap.org/api?task=incidents&locationlatitude=' . $queryParams['lat'] . '&locationlongitude=' . $queryParams['lng']);
+    $apiResponse = file_get_contents('https://maps.harassmap.org/api?task=incidents&by=latlon&radius=50&latitude=' . $queryParams['lat'] . '&longitude=' . $queryParams['lng']);
     $response = $response->withStatus(200);
     return $response->write($apiResponse);
 });

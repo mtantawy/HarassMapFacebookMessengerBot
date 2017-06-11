@@ -28,15 +28,36 @@
         </div>
     </script>
     <script>
-      var map;
-      var queryParams = new URLSearchParams(location.search.slice(1));
-      var lat = Number(queryParams.get('lat') || 28);
-      var lng = Number(queryParams.get('lng') || 31);
+      let map;
+      let markers = [];
+      let queryParams = new URLSearchParams(location.search.slice(1));
+      let lat = Number(queryParams.get('lat') || 28);
+      let lng = Number(queryParams.get('lng') || 31);
 
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: lat, lng: lng},
-          zoom: 6
+            center: {lat: lat, lng: lng},
+            zoom: 6
+        });
+
+        // Add marker at user's location
+        const marker = new google.maps.Marker({
+            position: {lat: lat, lng: lng},
+            map: map,
+            draggable: true,
+            animation: google.maps.Animation.DROP,
+            icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
+            title: 'Your Location'
+        });
+
+        // Re-trigger searching for nearby incidents
+        marker.addListener('dragend', (event) => {
+            lat = event.latLng.lat();
+            lng = event.latLng.lng();
+
+            setTimeout(() => {
+                getData().then(renderMarkers);
+            }, 0);
         });
       }
 
@@ -75,6 +96,13 @@
         const bounds = new google.maps.LatLngBounds();
         const openWindows = [];
 
+        if (markers.length > 0) {
+            markers.forEach((marker) => {
+                marker.setMap(null);
+                marker = null;
+            });
+        }
+
         incidents.forEach((incident) => {
             const incidentDetails = incident.incident;
             const latitude = Number(incidentDetails.locationlatitude);
@@ -89,7 +117,7 @@
             const marker = new google.maps.Marker({
                 position: {lat: latitude, lng: longitude},
                 map: map,
-                title: 'Nearby Incidents'
+                title: incidentDetails['locationname'] || 'Nearby Incident'
             });
 
             marker.addListener('click', function() {
@@ -100,6 +128,8 @@
 
             openWindows.push(infowindow);
             bounds.extend(LatLng);
+
+            markers.push(marker);
         });
 
         map.fitBounds(bounds);
