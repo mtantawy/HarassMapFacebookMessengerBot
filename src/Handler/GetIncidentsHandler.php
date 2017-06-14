@@ -145,7 +145,7 @@ class GetIncidentsHandler implements Handler
                         'details',
                         $this->user->getPreferredLanguage(),
                         $this->user->getGender()
-                    ) . ': ' . $value;
+                    ) . ': ' . mb_substr($value, 0, 350) . (mb_strlen($value) > 350 ? '...' : '');
                     break;
 
                 case 'datetime':
